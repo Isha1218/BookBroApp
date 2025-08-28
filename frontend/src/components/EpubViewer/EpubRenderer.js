@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useCallback, useState } from "react";
 import ePub from "epubjs";
+import BottomBar from "./BottomBar";
 
 const EpubRenderer = () => {
   const viewerRef = useRef(null);
@@ -117,8 +118,10 @@ const EpubRenderer = () => {
           width: "100%", 
           height: "100%", 
           overflow: "hidden",
+          zIndex: 0
         }}
       />
+      <BottomBar position={'6 pages left'}/>
     </div>
   );
 };

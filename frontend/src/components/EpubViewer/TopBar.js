@@ -1,4 +1,6 @@
-const BottomBar = ({ position, showBar }) => {
+import React from "react";
+
+const TopBar = ({ title, showBar }) => {
     return (
         <div
           style={{
@@ -13,9 +15,9 @@ const BottomBar = ({ position, showBar }) => {
           <p style={{
             color: 'gray',
             fontSize: '18px'
-          }}>{position}</p>
+          }}>{title}</p>
         </div>
     )
 }
 
-export default BottomBar;
+export default TopBar;

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useCallback, useState } from "react";
 import ePub from "epubjs";
 import BottomBar from "./BottomBar";
+import TopBar from "./TopBar";
 
 const EpubRenderer = () => {
   const viewerRef = useRef(null);
@@ -14,6 +15,10 @@ const EpubRenderer = () => {
   const swipeThreshold = 30;
   const verticalTolerance = 60;
   const swipeTimeThreshold = 500;
+  const tapMaxDistance = 10;
+  const tapMaxTime = 250;
+
+  const [showBar, setShowBar] = useState(false);
 
   const handleTouchStart = useCallback((e) => {
     const touch = e.touches[0];
@@ -42,7 +47,6 @@ const EpubRenderer = () => {
           return;
         }
       } catch (err) {
-        // Ignore selection check errors
       }
 
       if (deltaX > 0) {
@@ -50,8 +54,25 @@ const EpubRenderer = () => {
       } else {
         renditionRef.current?.next();
       }
+      return;
     }
+
+    if (Math.abs(deltaX) < tapMaxDistance && Math.abs(deltaY) < tapMaxDistance && touchDuration < tapMaxTime) {
+      setShowBar(prev => !prev);
+    }
+    
   }, [swipeThreshold, verticalTolerance, swipeTimeThreshold]);
+
+  useEffect(() => {
+    if (!showBar) return;
+  
+    const timer = setTimeout(() => {
+      setShowBar(false);
+    }, 5000)
+  
+    return () => clearTimeout(timer);
+  }, [showBar]);
+  
 
   useEffect(() => {
     const url =
@@ -104,6 +125,7 @@ const EpubRenderer = () => {
         height: "100vh", 
         position: "relative",
         display: "flex",
+        flexDirection: 'column',
         alignItems: "center",
         justifyContent: "center",
         padding: "40px",
@@ -112,16 +134,16 @@ const EpubRenderer = () => {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
+      <TopBar title={'A Court of Silver Flames'} showBar={showBar}/>
       <div
         ref={viewerRef}
         style={{ 
           width: "100%", 
           height: "100%", 
-          overflow: "hidden",
           zIndex: 0
         }}
       />
-      <BottomBar position={'6 pages left'}/>
+      <BottomBar position={'20%'} showBar={showBar}/>
     </div>
   );
 };

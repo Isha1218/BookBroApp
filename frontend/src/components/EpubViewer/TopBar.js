@@ -13,7 +13,7 @@ const TopBar = ({ title, showBar }) => {
           }}
         >
           <p style={{
-            color: 'gray',
+            color: '#ababab',
             fontSize: '18px'
           }}>{title}</p>
         </div>

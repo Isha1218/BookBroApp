@@ -19,6 +19,7 @@ const EpubRenderer = () => {
   const tapMaxTime = 250;
 
   const [showBar, setShowBar] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   const handleTouchStart = useCallback((e) => {
     const touch = e.touches[0];
@@ -90,6 +91,22 @@ const EpubRenderer = () => {
 
     renditionRef.current.display();
 
+    bookRef.current.ready.then(() => {
+      bookRef.current.locations.generate(1600).then(() => {
+        const location = renditionRef.current.currentLocation();
+        const progress = bookRef.current.locations.percentageFromCfi(location.start.cfi);
+        setProgress(progress * 100);
+      });
+    });
+
+    const handleRelocated = (location) => {
+      const progress = bookRef.current.locations.percentageFromCfi(location.start.cfi);
+      setProgress(progress * 100);
+    };
+
+    renditionRef.current.on("relocated", handleRelocated);
+
+
     renditionRef.current.on("touchstart", handleTouchStart);
     renditionRef.current.on("touchend", handleTouchEnd);
 
@@ -143,7 +160,7 @@ const EpubRenderer = () => {
           zIndex: 0
         }}
       />
-      <BottomBar position={'20%'} showBar={showBar}/>
+      <BottomBar position={Math.round(progress) + "%"} showBar={showBar}/>
     </div>
   );
 };

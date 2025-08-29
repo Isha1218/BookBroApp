@@ -11,7 +11,7 @@ const BottomBar = ({ position, showBar }) => {
           }}
         >
           <p style={{
-            color: 'gray',
+            color: '#ababab',
             fontSize: '18px'
           }}>{position}</p>
         </div>

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useCallback, useState } from "react";
 import ePub from "epubjs";
 import BottomBar from "./BottomBar";
 import TopBar from "./TopBar";
+import SelectionMenu from "./SelectionMenu";
 
 const EpubRenderer = () => {
   const viewerRef = useRef(null);
@@ -20,6 +21,10 @@ const EpubRenderer = () => {
 
   const [showBar, setShowBar] = useState(false);
   const [progress, setProgress] = useState(0);
+
+  // ✅ State for selection menu
+  const [selectionMenuPosition, setSelectionMenuPosition] = useState(null);
+  const [isSelectionMenuVisible, setIsSelectionMenuVisible] = useState(false);
 
   const handleTouchStart = useCallback((e) => {
     const touch = e.touches[0];
@@ -47,8 +52,7 @@ const EpubRenderer = () => {
         if (selection && selection.toString().length > 0) {
           return;
         }
-      } catch (err) {
-      }
+      } catch (err) {}
 
       if (deltaX > 0) {
         renditionRef.current?.prev();
@@ -58,22 +62,25 @@ const EpubRenderer = () => {
       return;
     }
 
-    if (Math.abs(deltaX) < tapMaxDistance && Math.abs(deltaY) < tapMaxDistance && touchDuration < tapMaxTime) {
-      setShowBar(prev => !prev);
+    if (
+      Math.abs(deltaX) < tapMaxDistance &&
+      Math.abs(deltaY) < tapMaxDistance &&
+      touchDuration < tapMaxTime
+    ) {
+      setShowBar((prev) => !prev);
+      setIsSelectionMenuVisible(false); // ✅ Hide selection menu on tap
     }
-    
   }, [swipeThreshold, verticalTolerance, swipeTimeThreshold]);
 
   useEffect(() => {
     if (!showBar) return;
-  
+
     const timer = setTimeout(() => {
       setShowBar(false);
-    }, 5000)
-  
+    }, 5000);
+
     return () => clearTimeout(timer);
   }, [showBar]);
-  
 
   useEffect(() => {
     const url =
@@ -86,7 +93,7 @@ const EpubRenderer = () => {
       height: "100%",
       allowScriptedContent: true,
       flow: "paginated",
-      spread: "none"
+      spread: "none",
     });
 
     renditionRef.current.display();
@@ -94,39 +101,71 @@ const EpubRenderer = () => {
     bookRef.current.ready.then(() => {
       bookRef.current.locations.generate(1600).then(() => {
         const location = renditionRef.current.currentLocation();
-        const progress = bookRef.current.locations.percentageFromCfi(location.start.cfi);
+        const progress = bookRef.current.locations.percentageFromCfi(
+          location.start.cfi
+        );
         setProgress(progress * 100);
       });
     });
 
     const handleRelocated = (location) => {
-      const progress = bookRef.current.locations.percentageFromCfi(location.start.cfi);
+      const progress = bookRef.current.locations.percentageFromCfi(
+        location.start.cfi
+      );
       setProgress(progress * 100);
     };
 
     renditionRef.current.on("relocated", handleRelocated);
-
-
     renditionRef.current.on("touchstart", handleTouchStart);
     renditionRef.current.on("touchend", handleTouchEnd);
 
     renditionRef.current.on("selected", (cfiRange, contents) => {
-      console.log("Text selected:", cfiRange);
+      const selection = contents.window.getSelection();
+      if (!selection || selection.rangeCount === 0) return;
+
+      const range = selection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      const iframe = contents.document.defaultView.frameElement;
+      const iframeRect = iframe.getBoundingClientRect();
+
+      const absoluteTop = iframeRect.top + rect.top;
+      const absoluteLeft = iframeRect.left + rect.left;
+
+      // ✅ Position menu above the selection, centered
+      const viewportWidth = window.innerWidth;
+      const estimatedButtonWidth = 40;
+      const numberOfButtons = 4;
+      const estimatedGap = viewportWidth * 0.04;
+      const estimatedMenuWidth = estimatedButtonWidth * numberOfButtons + estimatedGap * (numberOfButtons - 1) + 40; // + padding
+
+      const horizontalPadding = 20;
+
+      const position = {
+        left: Math.min(
+          Math.max(absoluteLeft + rect.width / 2, estimatedMenuWidth / 2 + horizontalPadding),
+          viewportWidth - estimatedMenuWidth / 2 - horizontalPadding
+        ),
+        top: absoluteTop - 150,
+        transform: "translateX(-50%)",
+      };
+
+      setSelectionMenuPosition(position);
+      setIsSelectionMenuVisible(true);
     });
 
     renditionRef.current.themes.default({
-      "body": {
+      body: {
         "user-select": "text !important",
         "-webkit-user-select": "text !important",
-        "-webkit-touch-callout": "default !important",
-        "font-size": "32px !important"
+        "-webkit-touch-callout": "none !important",
+        "font-size": "32px !important",
       },
       "::selection": {
-        "background": "rgba(255, 255, 0, 0.3)"
+        background: "rgba(255, 255, 0, 0.3)",
       },
       "::-moz-selection": {
-        "background": "rgba(255, 255, 0, 0.3)"
-      }
+        background: "rgba(255, 255, 0, 0.3)",
+      },
     });
 
     return () => {
@@ -136,31 +175,35 @@ const EpubRenderer = () => {
   }, [handleTouchStart, handleTouchEnd]);
 
   return (
-    <div 
-      style={{ 
-        width: "100%", 
-        height: "100vh", 
+    <div
+      style={{
+        width: "100%",
+        height: "100vh",
         position: "relative",
         display: "flex",
-        flexDirection: 'column',
+        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         padding: "40px",
-        boxSizing: "border-box"
+        boxSizing: "border-box",
       }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <TopBar title={'A Court of Silver Flames'} showBar={showBar}/>
+      <TopBar title={"A Court of Silver Flames"} showBar={showBar} />
       <div
         ref={viewerRef}
-        style={{ 
-          width: "100%", 
-          height: "100%", 
-          zIndex: 0
+        style={{
+          width: "100%",
+          height: "100%",
+          zIndex: 0,
         }}
       />
-      <BottomBar position={Math.round(progress) + "%"} showBar={showBar}/>
+      <SelectionMenu
+        position={selectionMenuPosition}
+        isVisible={isSelectionMenuVisible}
+      />
+      <BottomBar position={Math.round(progress) + "%"} showBar={showBar} />
     </div>
   );
 };

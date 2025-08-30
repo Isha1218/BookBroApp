@@ -7,6 +7,11 @@ const config: CapacitorConfig = {
   server: {
     url: "http://192.168.0.19:3000",
     cleartext: true
+  },
+  ios: {
+    webContentsDebuggingEnabled: true,
+    allowsLinkPreview: false,
+    limitsNavigationsToAppBoundDomains: false
   }
 };
 

@@ -1,51 +1,48 @@
 import React, { forwardRef, useState, useEffect } from "react";
-import { PencilLine, Search, Book } from "lucide-react";
+import { PencilLine, Book } from "lucide-react";
 import { LuTextSearch } from "react-icons/lu";
+import { BsHighlighter } from "react-icons/bs";
 
-const iconSize = Math.max(16, Math.min(24, window.innerWidth * 0.03));
-
-const Circle = () => (
-  <div
-    style={{
-      borderRadius: "50%",
-      backgroundColor: "#FFDB58",
-      flexShrink: 0,
-      width: iconSize,
-      height: iconSize,
-    }}
-  />
-);
+const iconSize = Math.max(16, Math.min(24, window.innerWidth * 0.02));
 
 const MenuItem = ({ icon, label }) => (
-  <div
-    style={{
-      display: "flex",
-      flexDirection: "row",
-      alignItems: "center",
-      flexShrink: 0,
-      whiteSpace: "nowrap",
-      gap: "clamp(0.375rem, 2vw, 0.625rem)",
-      fontSize: "clamp(0.8rem, 2.5vw, 1.125rem)",
-      minWidth: 0,
-    }}
-  >
-    <span style={{ flexShrink: 0 }}>
-      {icon}
-    </span>
-    <span
+    <div
       style={{
-        color: "#ababab",
-        margin: 0,
-        flexShrink: 1,
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        flexShrink: 0,
+        whiteSpace: "nowrap",
+        gap: "clamp(0.375rem, 2vw, 0.625rem)",
+        fontSize: "clamp(0.8rem, 2.5vw, 1rem)",
         minWidth: 0,
-        overflow: "hidden",
-        textOverflow: "ellipsis",
       }}
     >
-      {label}
-    </span>
-  </div>
-);
+      <span
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}
+      >
+        {icon}
+      </span>
+      <span
+        style={{
+          color: "#ababab",
+          margin: 0,
+          flexShrink: 1,
+          minWidth: 0,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {label}
+      </span>
+    </div>
+  );
+  
 
 const SelectionMenu = forwardRef(({ showBar }, ref) => {
     const [isOverflowing, setIsOverflowing] = useState(false);
@@ -82,7 +79,7 @@ const SelectionMenu = forwardRef(({ showBar }, ref) => {
           }
         `}</style>
   
-        <MenuItem icon={<Circle />} label="Highlight" />
+        <MenuItem icon={<BsHighlighter size={iconSize} color="#ababab" />} label="Highlight" />
         <MenuItem icon={<PencilLine size={iconSize} color="#ababab" />} label="Note" />
         <MenuItem icon={<LuTextSearch size={iconSize} color="#ababab" />} label="Look Up" />
         <MenuItem icon={<Book size={iconSize} color="#ababab" />} label="Define" />

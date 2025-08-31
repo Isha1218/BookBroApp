@@ -9,6 +9,7 @@ const EpubRenderer = () => {
   const bookRef = useRef(null);
   const renditionRef = useRef(null);
   const menuRef = useRef(null);
+  const topBarRef = useRef(null);
 
   const isMenuTouch = useRef(false);
 
@@ -48,7 +49,8 @@ const EpubRenderer = () => {
     touchStartY.current = touch.clientY;
     touchStartTime.current = e.timeStamp;
 
-    if (menuRef.current && menuRef.current.contains(e.target)) {
+    if ((menuRef.current && menuRef.current.contains(e.target)) ||
+        (topBarRef.current && topBarRef.current.contains(e.target))) {
       isMenuTouch.current = true;
     } else {
       isMenuTouch.current = false;
@@ -120,7 +122,7 @@ const EpubRenderer = () => {
 
     renditionRef.current.display();
 
-    bookRef.current.ready.then(() => {
+     bookRef.current.ready.then(() => {
       bookRef.current.locations.generate(1600).then(() => {
         const location = renditionRef.current.currentLocation();
         const progress = bookRef.current.locations.percentageFromCfi(
@@ -199,7 +201,7 @@ const EpubRenderer = () => {
       {isTextSelected ? (
         <SelectionMenu ref={menuRef} showBar={showSelectionMenu} />
       ) : (
-        <TopBar title={"A Court of Silver Flames"} showBar={showBar} />
+        <TopBar ref={topBarRef} showBar={showBar} />
       )}
 
       <div

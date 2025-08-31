@@ -3,6 +3,7 @@ import ePub from "epubjs";
 import BottomBar from "./BottomBar";
 import TopBar from "./TopBar";
 import SelectionMenu from "./SelectionMenu";
+import TableOfContents from "./TableOfContents";
 
 const EpubRenderer = () => {
   const viewerRef = useRef(null);
@@ -27,6 +28,8 @@ const EpubRenderer = () => {
   const [progress, setProgress] = useState(0);
   const [isTextSelected, setIsTextSelected] = useState(false);
   const [showSelectionMenu, setShowSelectionMenu] = useState(false);
+  
+  const [showTOC, setShowTOC] = useState(false);
 
   const getResponsiveFontSize = () => {
     const width = window.innerWidth;
@@ -183,37 +186,49 @@ const EpubRenderer = () => {
   }, [handleTouchStart, handleTouchEnd]);
 
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100vh",
-        position: "relative",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "50px 40px 40px 40px",
-        boxSizing: "border-box",
-      }}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-    >
-      {isTextSelected ? (
-        <SelectionMenu ref={menuRef} showBar={showSelectionMenu} />
-      ) : (
-        <TopBar ref={topBarRef} showBar={showBar} />
-      )}
+    <>
+      <TableOfContents 
+        showTOC={showTOC}
+        onToggle={() => setShowTOC(!showTOC)}
+        bookRef={bookRef}
+        renditionRef={renditionRef}
+      />
 
+      {/* Main Content Container */}
       <div
-        ref={viewerRef}
         style={{
           width: "100%",
-          height: "100%",
-          zIndex: 0,
+          height: "100vh",
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "50px 40px 40px 40px",
+          boxSizing: "border-box",
+          marginLeft: showTOC ? "300px" : "0",
+          transition: "margin-left 0.3s ease",
         }}
-      />
-      <BottomBar position={Math.round(progress) + "%"} showBar={showBar} />
-    </div>
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {isTextSelected ? (
+          <SelectionMenu ref={menuRef} showBar={showSelectionMenu} />
+        ) : (
+          <TopBar ref={topBarRef} showBar={showBar} />
+        )}
+
+        <div
+          ref={viewerRef}
+          style={{
+            width: "100%",
+            height: "100%",
+            zIndex: 0,
+          }}
+        />
+        <BottomBar position={Math.round(progress) + "%"} showBar={showBar} />
+      </div>
+    </>
   );
 };
 

@@ -3,6 +3,7 @@ import ePub from "epubjs";
 import BottomBar from "./BottomBar";
 import TopBar from "./TopBar";
 import SelectionMenu from "./SelectionMenu";
+import ViewFeatureModal from "./ViewFeatureModal";
 
 const EpubRenderer = () => {
   const viewerRef = useRef(null);
@@ -27,6 +28,8 @@ const EpubRenderer = () => {
   const [progress, setProgress] = useState(0);
   const [isTextSelected, setIsTextSelected] = useState(false);
   const [showSelectionMenu, setShowSelectionMenu] = useState(false);
+  const [showFeatureModal, setShowFeatureModal] = useState(false);
+  const [toc, setToc] = useState([]);
 
   const getResponsiveFontSize = () => {
     const width = window.innerWidth;
@@ -42,6 +45,19 @@ const EpubRenderer = () => {
 
     return minFont + ((width - minWidth) / (maxWidth - minWidth)) * (maxFont - minFont);
   };
+
+  const handleNavigate = useCallback((href) => {
+    renditionRef.current.display(href);
+    setShowFeatureModal(false);
+  }, []);
+
+  const handleShowFeatureModal = useCallback(() => {
+    setShowFeatureModal(true);
+  }, []);
+
+  const handleCloseFeatureModal = useCallback(() => {
+    setShowFeatureModal(false);
+  }, []);
 
   const handleTouchStart = useCallback((e) => {
     const touch = e.touches[0];
@@ -123,6 +139,8 @@ const EpubRenderer = () => {
     renditionRef.current.display();
 
      bookRef.current.ready.then(() => {
+      const navigation = bookRef.current.navigation;
+      setToc(navigation.toc);
       bookRef.current.locations.generate(1600).then(() => {
         const location = renditionRef.current.currentLocation();
         const progress = bookRef.current.locations.percentageFromCfi(
@@ -195,6 +213,7 @@ const EpubRenderer = () => {
         padding: "50px 40px 40px 40px",
         boxSizing: "border-box",
       }}
+      
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -212,7 +231,8 @@ const EpubRenderer = () => {
           zIndex: 0,
         }}
       />
-      <BottomBar position={Math.round(progress) + "%"} showBar={showBar} />
+      {showFeatureModal && <ViewFeatureModal onCloseFeatureModal={handleCloseFeatureModal} toc={toc} onNavigate={handleNavigate}/>}
+      <BottomBar position={Math.round(progress) + "%"} showBar={showBar} onShowFeatureModal={handleShowFeatureModal}/>
     </div>
   );
 };

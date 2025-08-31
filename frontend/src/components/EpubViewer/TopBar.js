@@ -36,6 +36,7 @@ const MenuItem = ({ icon, label }) => (
         minWidth: 0,
         overflow: "hidden",
         textOverflow: "ellipsis",
+        // fontFamily: "Ubuntu"
       }}
     >
       {label}

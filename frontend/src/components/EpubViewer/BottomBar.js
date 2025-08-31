@@ -12,7 +12,7 @@ const BottomBar = ({ position, showBar }) => {
         >
           <p style={{
             color: '#ababab',
-            fontSize: '18px'
+            fontSize: 'clamp(14px, 2.5vw, 18px)',
           }}>{position}</p>
         </div>
     )

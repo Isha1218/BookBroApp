@@ -8,13 +8,16 @@ const TopBar = ({ title, showBar }) => {
             transition: 'opacity 0.3s ease-in-out',
             display: 'flex',
             flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center'
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '60px',
+            width: '100%'
           }}
         >
           <p style={{
             color: '#ababab',
-            fontSize: '18px'
+            fontSize: 'clamp(14px, 2.5vw, 18px)',
+            margin: 0
           }}>{title}</p>
         </div>
     )

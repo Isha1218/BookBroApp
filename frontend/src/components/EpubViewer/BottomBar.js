@@ -26,7 +26,7 @@ const BottomBar = ({ position, showBar, onShowFeatureModal }) => {
             color: '#ababab',
             fontSize: 'clamp(0.8rem, 2.5vw, 1rem)',
           }}>{position}</p>
-          <LuSettings2 color='#ababab' size={Math.max(16, Math.min(24, window.innerWidth * 0.02))}/>
+          <LuSettings2 color='transparent' size={Math.max(16, Math.min(24, window.innerWidth * 0.02))}/>
         </div>
     )
 }

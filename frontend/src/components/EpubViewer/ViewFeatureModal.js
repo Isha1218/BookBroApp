@@ -3,6 +3,7 @@ import LookUp from "./LookUp";
 import Recap from "./Recap";
 import Roleplay from "./Roleplay";
 import Search from "./Search";
+import Settings from "./Settings";
 import TableOfContents from "./TableOfContents";
 import React from "react";
 
@@ -53,12 +54,12 @@ const ViewFeatureModal = ({ onCloseFeatureModal, toc, onNavigate, currIndex, boo
                 >
                     ✕
                 </button>
-                {/* <TableOfContents toc={toc} onNavigate={onNavigate} currIndex={currIndex}/> */}
+                <TableOfContents toc={toc} onNavigate={onNavigate} currIndex={currIndex}/>
                 {/* <Recap/> */}
                 {/* <Search book={book} toc={toc} onNavigate={onNavigate} /> */}
                 {/* <Chat/> */}
                 {/* <Roleplay/> */}
-                <LookUp/>
+                {/* <LookUp/> */}
             </div>
         </div>
     );

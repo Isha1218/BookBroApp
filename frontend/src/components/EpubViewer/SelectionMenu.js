@@ -80,9 +80,7 @@ const SelectionMenu = forwardRef(({ showBar }, ref) => {
         `}</style>
   
         <MenuItem icon={<BsHighlighter size={iconSize} color="#ababab" />} label="Highlight" />
-        <MenuItem icon={<PencilLine size={iconSize} color="#ababab" />} label="Note" />
         <MenuItem icon={<LuTextSearch size={iconSize} color="#ababab" />} label="Look Up" />
-        <MenuItem icon={<Book size={iconSize} color="#ababab" />} label="Define" />
       </div>
     );
   });

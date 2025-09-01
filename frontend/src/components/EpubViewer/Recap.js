@@ -15,7 +15,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor i
       const timeout = setTimeout(() => {
         setDisplayedText(prev => prev + contentText[currentIndex]);
         setCurrentIndex(prev => prev + 1);
-      }, 30); // Adjust speed here (lower = faster)
+      }, 30);
       
       return () => clearTimeout(timeout);
     }

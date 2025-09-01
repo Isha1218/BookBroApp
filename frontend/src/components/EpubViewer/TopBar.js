@@ -82,7 +82,7 @@ const TopBar = forwardRef(({ showBar }, ref) => {
         `}</style>
   
         <MenuItem icon={<LuList size={iconSize} color="#ababab" />} label="Chapters" />
-        <MenuItem icon={<IoChatboxEllipsesOutline size={iconSize} color="#ababab" />} label="Chat" />
+        <MenuItem icon={<IoChatboxEllipsesOutline size={iconSize} color="#ababab" />} label="Ask Bro" />
         <MenuItem icon={<PiSkipBack size={iconSize} color="#ababab" />} label="Recap" />
         <MenuItem icon={<LiaTheaterMasksSolid size={iconSize} color="#ababab" />} label="Roleplay" />
         <MenuItem icon={<LuSearch size={iconSize} color="#ababab" />} label="Search" />

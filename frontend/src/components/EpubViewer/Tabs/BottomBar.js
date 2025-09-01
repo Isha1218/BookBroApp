@@ -2,7 +2,7 @@ import React from "react";
 import { FiArrowLeft } from "react-icons/fi";
 import { LuSettings2 } from "react-icons/lu";
 
-const BottomBar = ({ position, showBar, onShowFeatureModal }) => {
+const BottomBar = ({ position, showBar }) => {
     return (
         <div
           style={{
@@ -21,7 +21,7 @@ const BottomBar = ({ position, showBar, onShowFeatureModal }) => {
             border: 'none',
             margin: 0,
             padding: 0,
-          }} onClick={onShowFeatureModal}><FiArrowLeft color='#ababab' size={Math.max(16, Math.min(24, window.innerWidth * 0.02))}/></button>
+          }}><FiArrowLeft color='#ababab' size={Math.max(16, Math.min(24, window.innerWidth * 0.02))}/></button>
           <p style={{
             color: '#ababab',
             fontSize: 'clamp(0.8rem, 2.5vw, 1rem)',

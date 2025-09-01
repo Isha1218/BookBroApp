@@ -7,7 +7,16 @@ import Settings from "../Features/Settings";
 import TableOfContents from "../Features/TableOfContents";
 import React from "react";
 
-const ViewFeatureModal = ({ onCloseFeatureModal, toc, onNavigate, currIndex, book }) => {
+const ViewFeatureModal = ({ onCloseFeatureModal, toc, onNavigate, currIndex, book, featureModalIndex }) => {
+    const features = [
+        <TableOfContents toc={toc} onNavigate={onNavigate} currIndex={currIndex}/>,
+        <Chat/>,
+        <Recap/>,
+        <Roleplay/>,
+        <Search book={book} toc={toc} onNavigate={onNavigate} />,
+        <LookUp/>
+    ];
+
     return (
         <div
             style={{
@@ -54,12 +63,13 @@ const ViewFeatureModal = ({ onCloseFeatureModal, toc, onNavigate, currIndex, boo
                 >
                     ✕
                 </button>
-                <TableOfContents toc={toc} onNavigate={onNavigate} currIndex={currIndex}/>
+                {/* <TableOfContents toc={toc} onNavigate={onNavigate} currIndex={currIndex}/> */}
                 {/* <Recap/> */}
                 {/* <Search book={book} toc={toc} onNavigate={onNavigate} /> */}
                 {/* <Chat/> */}
                 {/* <Roleplay/> */}
                 {/* <LookUp/> */}
+                {features[featureModalIndex]}
             </div>
         </div>
     );

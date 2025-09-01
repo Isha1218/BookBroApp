@@ -8,45 +8,49 @@ import { LiaTheaterMasksSolid } from "react-icons/lia";
 
 const iconSize = Math.max(16, Math.min(24, window.innerWidth * 0.02));
 
-const MenuItem = ({ icon, label }) => (
-  <div
-    style={{
-      display: "flex",
-      flexDirection: "row",
-      alignItems: "center",
-      flexShrink: 0,
-      whiteSpace: "nowrap",
-      gap: "clamp(0.375rem, 2vw, 0.625rem)",
-      fontSize: "clamp(0.8rem, 2.5vw, 1rem)",
-      minWidth: 0,
-    }}
-  >
-    <span
+const MenuItem = ({ icon, label, onShowFeatureModal }) => (
+  <button onClick={onShowFeatureModal} style={{
+    all: 'unset',
+  }}>
+    <div
       style={{
         display: "flex",
+        flexDirection: "row",
         alignItems: "center",
-        justifyContent: "center",
         flexShrink: 0,
-      }}
-    >
-      {icon}
-    </span>
-    <span
-      style={{
-        color: "#ababab",
-        margin: 0,
-        flexShrink: 1,
+        whiteSpace: "nowrap",
+        gap: "clamp(0.375rem, 2vw, 0.625rem)",
+        fontSize: "clamp(0.8rem, 2.5vw, 1rem)",
         minWidth: 0,
-        overflow: "hidden",
-        textOverflow: "ellipsis",
       }}
     >
-      {label}
-    </span>
-  </div>
+      <span
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}
+      >
+          {icon}
+      </span>
+      <span
+        style={{
+          color: "#ababab",
+          margin: 0,
+          flexShrink: 1,
+          minWidth: 0,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {label}
+      </span>
+    </div>
+  </button>
 );
 
-const TopBar = forwardRef(({ showBar }, ref) => {
+const TopBar = forwardRef(({ showBar, onShowFeatureModal }, ref) => {
     const [isOverflowing, setIsOverflowing] = useState(false);
   
     useEffect(() => {
@@ -81,11 +85,11 @@ const TopBar = forwardRef(({ showBar }, ref) => {
           }
         `}</style>
   
-        <MenuItem icon={<LuList size={iconSize} color="#ababab" />} label="Chapters" />
-        <MenuItem icon={<IoChatboxEllipsesOutline size={iconSize} color="#ababab" />} label="Ask Bro" />
-        <MenuItem icon={<PiSkipBack size={iconSize} color="#ababab" />} label="Recap" />
-        <MenuItem icon={<LiaTheaterMasksSolid size={iconSize} color="#ababab" />} label="Roleplay" />
-        <MenuItem icon={<LuSearch size={iconSize} color="#ababab" />} label="Search" />
+        <MenuItem icon={<LuList size={iconSize} color="#ababab"/>} label="Chapters" onShowFeatureModal={() => onShowFeatureModal(0)}/>
+        <MenuItem icon={<IoChatboxEllipsesOutline size={iconSize} color="#ababab" />} label="Ask Bro" onShowFeatureModal={() => onShowFeatureModal(1)}/>
+        <MenuItem icon={<PiSkipBack size={iconSize} color="#ababab" />} label="Recap" onShowFeatureModal={() => onShowFeatureModal(2)}/>
+        <MenuItem icon={<LiaTheaterMasksSolid size={iconSize} color="#ababab" />} label="Roleplay" onShowFeatureModal={() => onShowFeatureModal(3)}/>
+        <MenuItem icon={<LuSearch size={iconSize} color="#ababab" />} label="Search" onShowFeatureModal={() => onShowFeatureModal(4)} />
       </div>
     );
   });

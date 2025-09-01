@@ -28,7 +28,7 @@ const EpubRenderer = () => {
   const [progress, setProgress] = useState(0);
   const [isTextSelected, setIsTextSelected] = useState(false);
   const [showSelectionMenu, setShowSelectionMenu] = useState(false);
-  const [showFeatureModal, setShowFeatureModal] = useState(false);
+  const [featureModalIndex, setFeatureModalIndex] = useState(-1);
   const [toc, setToc] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -47,15 +47,15 @@ const EpubRenderer = () => {
 
   const handleNavigate = useCallback((href) => {
     renditionRef.current.display(href);
-    setShowFeatureModal(false);
   }, []);
 
-  const handleShowFeatureModal = useCallback(() => {
-    setShowFeatureModal(true);
+  const handleShowFeatureModal = useCallback((index) => {
+    setFeatureModalIndex(index);
   }, []);
+
 
   const handleCloseFeatureModal = useCallback(() => {
-    setShowFeatureModal(false);
+    setFeatureModalIndex(-1);
   }, []);
 
   const handleTouchStart = useCallback((e) => {
@@ -236,9 +236,9 @@ const EpubRenderer = () => {
       onTouchEnd={handleTouchEnd}
     >
       {isTextSelected ? (
-        <SelectionMenu ref={menuRef} showBar={showSelectionMenu} />
+        <SelectionMenu ref={menuRef} showBar={showSelectionMenu} onShowFeatureModal={handleShowFeatureModal} />
       ) : (
-        <TopBar ref={topBarRef} showBar={showBar} />
+        <TopBar ref={topBarRef} showBar={showBar} onShowFeatureModal={handleShowFeatureModal} />
       )}
 
       <div
@@ -249,19 +249,19 @@ const EpubRenderer = () => {
           zIndex: 0,
         }}
       />
-      {showFeatureModal && (
+      {featureModalIndex != -1 && (
         <ViewFeatureModal
           onCloseFeatureModal={handleCloseFeatureModal}
           toc={toc}
           onNavigate={handleNavigate}
           currIndex={currentIndex}
           book={bookRef.current}
+          featureModalIndex={featureModalIndex}
         />
       )}
       <BottomBar
         position={Math.round(progress) + "%"}
         showBar={showBar}
-        onShowFeatureModal={handleShowFeatureModal}
       />
     </div>
   );

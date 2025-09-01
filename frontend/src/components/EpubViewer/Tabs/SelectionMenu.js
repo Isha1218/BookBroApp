@@ -5,7 +5,10 @@ import { BsHighlighter } from "react-icons/bs";
 
 const iconSize = Math.max(16, Math.min(24, window.innerWidth * 0.02));
 
-const MenuItem = ({ icon, label }) => (
+const MenuItem = ({ icon, label, onShowFeatureModal }) => (
+  <button onClick={onShowFeatureModal} style={{
+    all: 'unset',
+  }}>
     <div
       style={{
         display: "flex",
@@ -41,10 +44,11 @@ const MenuItem = ({ icon, label }) => (
         {label}
       </span>
     </div>
+    </button>
   );
   
 
-const SelectionMenu = forwardRef(({ showBar }, ref) => {
+const SelectionMenu = forwardRef(({ showBar, onShowFeatureModal }, ref) => {
     const [isOverflowing, setIsOverflowing] = useState(false);
   
     useEffect(() => {
@@ -79,8 +83,8 @@ const SelectionMenu = forwardRef(({ showBar }, ref) => {
           }
         `}</style>
   
-        <MenuItem icon={<BsHighlighter size={iconSize} color="#ababab" />} label="Highlight" />
-        <MenuItem icon={<LuTextSearch size={iconSize} color="#ababab" />} label="Look Up" />
+        <MenuItem icon={<BsHighlighter size={iconSize} color="#ababab"/>} label="Highlight" onShowFeatureModal={() => onShowFeatureModal(-1)} />
+        <MenuItem icon={<LuTextSearch size={iconSize} color="#ababab"/>} label="Look Up" onShowFeatureModal={() => onShowFeatureModal(5)} />
       </div>
     );
   });

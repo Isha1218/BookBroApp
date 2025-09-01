@@ -1,10 +1,10 @@
-import Chat from "./Chat";
-import LookUp from "./LookUp";
-import Recap from "./Recap";
-import Roleplay from "./Roleplay";
-import Search from "./Search";
-import Settings from "./Settings";
-import TableOfContents from "./TableOfContents";
+import Chat from "../Features/Chat";
+import LookUp from "../Features/LookUp";
+import Recap from "../Features/Recap";
+import Roleplay from "../Features/Roleplay";
+import Search from "../Features/Search";
+import Settings from "../Features/Settings";
+import TableOfContents from "../Features/TableOfContents";
 import React from "react";
 
 const ViewFeatureModal = ({ onCloseFeatureModal, toc, onNavigate, currIndex, book }) => {

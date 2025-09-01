@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useCallback, useState } from "react";
 import ePub from "epubjs";
-import BottomBar from "./BottomBar";
-import TopBar from "./TopBar";
-import SelectionMenu from "./SelectionMenu";
-import ViewFeatureModal from "./ViewFeatureModal";
+import BottomBar from "./Tabs/BottomBar";
+import TopBar from "./Tabs/TopBar";
+import SelectionMenu from "./Tabs/SelectionMenu";
+import ViewFeatureModal from "./Modals/ViewFeatureModal";
 
 const EpubRenderer = () => {
   const viewerRef = useRef(null);

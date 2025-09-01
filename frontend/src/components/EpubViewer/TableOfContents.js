@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { IoIosCheckmark } from "react-icons/io";
 import { LuAsterisk } from "react-icons/lu";
 
-const TableOfContents = ({ toc, onNavigate, currIndex = 8 }) => {
+const TableOfContents = ({ toc, onNavigate, currIndex }) => {
   const globalIndex = useRef(0);
 
   const renderTocItems = (items, level = 0) => {
@@ -20,10 +20,10 @@ const TableOfContents = ({ toc, onNavigate, currIndex = 8 }) => {
                 style={{
                   background: "none",
                   border: "none",
-                  padding: '6px',
+                  padding: '5px',
                   margin: 0,
-                  color: showCheck ? "#ababab" : "black",
-                  fontSize: "16px",
+                  color: showCheck ? "#919191" : "black",
+                  fontSize: "15px",
                   textAlign: "left",
                   width: "100%",
                   display: "flex",
@@ -33,7 +33,7 @@ const TableOfContents = ({ toc, onNavigate, currIndex = 8 }) => {
                   fontWeight: showCheck ? "400": "600",
                 }}
               >
-                {!showAsterisk ? (showCheck ? (<IoIosCheckmark size={24} color="#ababab" />) : (<IoIosCheckmark size={24} color="transparent" />)) : (<LuAsterisk size={24} color="black"/>)}
+                {!showAsterisk ? (showCheck ? (<IoIosCheckmark size={24} color="#919191" />) : (<IoIosCheckmark size={24} color="transparent" />)) : (<LuAsterisk size={24} color="black"/>)}
                 {item.label}
               </button>
               {item.subitems && item.subitems.length > 0 && renderTocItems(item.subitems, level + 1)}
@@ -48,8 +48,11 @@ const TableOfContents = ({ toc, onNavigate, currIndex = 8 }) => {
 
   return <div style={{ width: "95%", overflowY: "auto", maxHeight: "100%"}}>
     <p style={{
-        fontSize: '26px',
-        fontWeight: '700'
+        fontSize: '25px',
+        fontWeight: '700',
+        margin: 0,
+        marginBottom: '15px',
+        marginTop: '15px'
     }}>Chapters</p>
     {renderTocItems(toc)}
     </div>;

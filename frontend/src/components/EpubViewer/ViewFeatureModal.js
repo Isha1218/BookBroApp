@@ -1,7 +1,9 @@
+import Recap from "./Recap";
+import Search from "./Search";
 import TableOfContents from "./TableOfContents";
 import React from "react";
 
-const ViewFeatureModal = ({ onCloseFeatureModal, toc, onNavigate}) => {
+const ViewFeatureModal = ({ onCloseFeatureModal, toc, onNavigate, currIndex, book }) => {
     return (
         <div
             style={{
@@ -30,7 +32,7 @@ const ViewFeatureModal = ({ onCloseFeatureModal, toc, onNavigate}) => {
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
-                    justifyContent: "center",
+                    justifyContent: "start",
                     padding: "20px",
                 }}
             >
@@ -48,7 +50,9 @@ const ViewFeatureModal = ({ onCloseFeatureModal, toc, onNavigate}) => {
                 >
                     ✕
                 </button>
-                <TableOfContents toc={toc} onNavigate={onNavigate} />
+                {/* <TableOfContents toc={toc} onNavigate={onNavigate} currIndex={currIndex}/> */}
+                {/* <Recap/> */}
+                <Search book={book} toc={toc} onNavigate={onNavigate} />
             </div>
         </div>
     );

@@ -11,9 +11,9 @@ const EpubRenderer = () => {
   const renditionRef = useRef(null);
   const menuRef = useRef(null);
   const topBarRef = useRef(null);
+  const tocRef = useRef([]);
 
   const isMenuTouch = useRef(false);
-
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
   const touchStartTime = useRef(0);
@@ -30,13 +30,12 @@ const EpubRenderer = () => {
   const [showSelectionMenu, setShowSelectionMenu] = useState(false);
   const [showFeatureModal, setShowFeatureModal] = useState(false);
   const [toc, setToc] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const getResponsiveFontSize = () => {
     const width = window.innerWidth;
-
     const minWidth = 320;
     const maxWidth = 1024;
-
     const minFont = 20;
     const maxFont = 32;
 
@@ -65,8 +64,10 @@ const EpubRenderer = () => {
     touchStartY.current = touch.clientY;
     touchStartTime.current = e.timeStamp;
 
-    if ((menuRef.current && menuRef.current.contains(e.target)) ||
-        (topBarRef.current && topBarRef.current.contains(e.target))) {
+    if (
+      (menuRef.current && menuRef.current.contains(e.target)) ||
+      (topBarRef.current && topBarRef.current.contains(e.target))
+    ) {
       isMenuTouch.current = true;
     } else {
       isMenuTouch.current = false;
@@ -138,14 +139,25 @@ const EpubRenderer = () => {
 
     renditionRef.current.display();
 
-     bookRef.current.ready.then(() => {
+    bookRef.current.ready.then(() => {
       const navigation = bookRef.current.navigation;
       setToc(navigation.toc);
+
+      const flatToc = [];
+      const flattenToc = (items) => {
+        items.forEach((item) => {
+          flatToc.push(item);
+          if (item.subitems && item.subitems.length > 0) {
+            flattenToc(item.subitems);
+          }
+        });
+      };
+      flattenToc(navigation.toc);
+      tocRef.current = flatToc;
+
       bookRef.current.locations.generate(1600).then(() => {
         const location = renditionRef.current.currentLocation();
-        const progress = bookRef.current.locations.percentageFromCfi(
-          location.start.cfi
-        );
+        const progress = bookRef.current.locations.percentageFromCfi(location.start.cfi);
         setProgress(progress * 100);
       });
     });
@@ -153,6 +165,13 @@ const EpubRenderer = () => {
     const handleRelocated = (location) => {
       const progress = bookRef.current.locations.percentageFromCfi(location.start.cfi);
       setProgress(progress * 100);
+
+      const href = location.start.href.replace(/#.*/, "");
+      const index = tocRef.current.findIndex((item) =>
+        item.href.replace(/#.*/, "").endsWith(href)
+      );
+
+      if (index !== -1) setCurrentIndex(index);
     };
 
     renditionRef.current.on("selected", (cfiRange) => {
@@ -210,10 +229,9 @@ const EpubRenderer = () => {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        padding: "50px 40px 40px 40px",
+        padding: "40px",
         boxSizing: "border-box",
       }}
-      
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -231,8 +249,20 @@ const EpubRenderer = () => {
           zIndex: 0,
         }}
       />
-      {showFeatureModal && <ViewFeatureModal onCloseFeatureModal={handleCloseFeatureModal} toc={toc} onNavigate={handleNavigate}/>}
-      <BottomBar position={Math.round(progress) + "%"} showBar={showBar} onShowFeatureModal={handleShowFeatureModal}/>
+      {showFeatureModal && (
+        <ViewFeatureModal
+          onCloseFeatureModal={handleCloseFeatureModal}
+          toc={toc}
+          onNavigate={handleNavigate}
+          currIndex={currentIndex}
+          book={bookRef.current}
+        />
+      )}
+      <BottomBar
+        position={Math.round(progress) + "%"}
+        showBar={showBar}
+        onShowFeatureModal={handleShowFeatureModal}
+      />
     </div>
   );
 };

@@ -2,6 +2,9 @@ import React, { forwardRef, useState, useEffect } from "react";
 import { LuBookmark, LuSearch, LuList } from "react-icons/lu";
 import { PiSkipBack } from "react-icons/pi";
 import { IoChatboxEllipsesOutline } from "react-icons/io5";
+import { GiDualityMask } from "react-icons/gi";
+import { LiaTheaterMasksSolid } from "react-icons/lia";
+
 
 const iconSize = Math.max(16, Math.min(24, window.innerWidth * 0.02));
 
@@ -36,7 +39,6 @@ const MenuItem = ({ icon, label }) => (
         minWidth: 0,
         overflow: "hidden",
         textOverflow: "ellipsis",
-        // fontFamily: "Ubuntu"
       }}
     >
       {label}
@@ -64,7 +66,7 @@ const TopBar = forwardRef(({ showBar }, ref) => {
           justifyContent: isOverflowing ? "flex-start" : "center",
           alignItems: "center",
           width: "90%",
-          height: "60px",
+          height: "40px",
           boxSizing: "border-box",
           gap: "clamp(1.25rem, 6vw, 3.125rem)",
           overflowX: "auto",
@@ -80,9 +82,9 @@ const TopBar = forwardRef(({ showBar }, ref) => {
         `}</style>
   
         <MenuItem icon={<LuList size={iconSize} color="#ababab" />} label="Chapters" />
-        <MenuItem icon={<LuBookmark size={iconSize} color="#ababab" />} label="Bookmark" />
         <MenuItem icon={<IoChatboxEllipsesOutline size={iconSize} color="#ababab" />} label="Chat" />
         <MenuItem icon={<PiSkipBack size={iconSize} color="#ababab" />} label="Recap" />
+        <MenuItem icon={<LiaTheaterMasksSolid size={iconSize} color="#ababab" />} label="Roleplay" />
         <MenuItem icon={<LuSearch size={iconSize} color="#ababab" />} label="Search" />
       </div>
     );

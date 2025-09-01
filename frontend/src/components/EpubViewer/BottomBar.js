@@ -12,7 +12,8 @@ const BottomBar = ({ position, showBar, onShowFeatureModal }) => {
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
-            width: '90%'
+            width: '90%',
+            height: '40px'
           }}
         >
           <button style={{

@@ -64,7 +64,7 @@ const SelectionMenu = forwardRef(({ showBar }, ref) => {
           justifyContent: isOverflowing ? "flex-start" : "center",
           alignItems: "center",
           width: "90%",
-          height: "60px",
+          height: "40px",
           boxSizing: "border-box",
           gap: "clamp(1.25rem, 6vw, 3.125rem)",
           overflowX: "auto",

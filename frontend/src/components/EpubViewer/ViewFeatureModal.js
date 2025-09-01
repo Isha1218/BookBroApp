@@ -1,3 +1,4 @@
+import Chat from "./Chat";
 import Recap from "./Recap";
 import Search from "./Search";
 import TableOfContents from "./TableOfContents";
@@ -52,7 +53,8 @@ const ViewFeatureModal = ({ onCloseFeatureModal, toc, onNavigate, currIndex, boo
                 </button>
                 {/* <TableOfContents toc={toc} onNavigate={onNavigate} currIndex={currIndex}/> */}
                 {/* <Recap/> */}
-                <Search book={book} toc={toc} onNavigate={onNavigate} />
+                {/* <Search book={book} toc={toc} onNavigate={onNavigate} /> */}
+                <Chat/>
             </div>
         </div>
     );

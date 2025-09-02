@@ -2,6 +2,8 @@ import React, { useState, useEffect, use } from "react";
 import extractPrevChapters from "../../../services/ExtractPrevChapters";
 import extractCurrPage from "../../../services/ExtractCurrPage";
 import extractCurrChapter from "../../../services/ExtractCurrChapter";
+import doRecap from "../../../api/llm/RecapApi";
+import extractPrevChapter from "../../../services/ExtractPrevChapter";
 
 const Recap = ({ rendition, book }) => {
   const [displayedText, setDisplayedText] = useState("");
@@ -10,9 +12,15 @@ const Recap = ({ rendition, book }) => {
 
   useEffect(() => {
     const fetchRecap = async () => {
-      // const recap = await extractPrevChapters(rendition, book);
+      const prevChapters = await extractPrevChapters(rendition, book);
       // const recap = await extractCurrPage(rendition);
-      const recap = await extractCurrChapter(rendition, book);
+      // const currChapter = await extractCurrChapter(rendition, book);
+      // const recapContext = prevChapters + currChapter;
+      // const recap = await extractPrevChapters(rendition, book);
+      const prevChapter = await extractPrevChapter(rendition, book);
+      const currChapter = await extractCurrChapter(rendition, book);
+      const recapContext = prevChapter + currChapter;
+      const recap = await doRecap(recapContext)
       setRecapText(recap);
     };
 

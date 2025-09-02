@@ -14,7 +14,7 @@ const extractPrevChapters = async (rendition, book) => {
         if (!spineItem.document) {
             await spineItem.load(book.load.bind(book));
         }
-        prevChapters += spineItem.document?.body?.textContent?.trim() || "" + "\n"
+        prevChapters += spineItem.document?.body?.textContent?.trim() || "" + "\n\n"
     }
 
     console.log(prevChapters)

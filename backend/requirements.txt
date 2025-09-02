@@ -1,0 +1,13 @@
+langchain
+google-generativeai
+faiss-cpu
+langchain_community
+fastapi
+uvicorn
+pydantic
+langchain-text-splitters
+boto3
+python-multipart
+psycopg2
+psycopg2-binary
+sentence-transformers

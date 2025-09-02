@@ -27,6 +27,7 @@ const EpubRenderer = () => {
   const [showBar, setShowBar] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isTextSelected, setIsTextSelected] = useState(false);
+  const [selectedText, setSelectedText] = useState("");
   const [showSelectionMenu, setShowSelectionMenu] = useState(false);
   const [featureModalIndex, setFeatureModalIndex] = useState(-1);
   const [toc, setToc] = useState([]);
@@ -174,9 +175,17 @@ const EpubRenderer = () => {
       if (index !== -1) setCurrentIndex(index);
     };
 
-    renditionRef.current.on("selected", (cfiRange) => {
+    renditionRef.current.on("selected", async (cfiRange) => {
       setIsTextSelected(true);
       console.log("Text selected:", cfiRange);
+
+      try {
+        const range = await bookRef.current.getRange(cfiRange);
+        const selectedText = range?.toString().trim() || "";
+        setSelectedText(selectedText);
+      } catch (err) {
+        console.error("Error extracting selected text:", err);
+      }
     });
 
     renditionRef.current.on("rendered", () => {
@@ -258,6 +267,7 @@ const EpubRenderer = () => {
           book={bookRef.current}
           rendition={renditionRef.current}
           featureModalIndex={featureModalIndex}
+          selectedText={selectedText}
         />
       )}
       <BottomBar

@@ -21,7 +21,7 @@ const doRecap = async (recapContext) => {
         const data = await response.json();
         return data.result;
     } catch (error) {
-        console.error('Error calling doing lookup', error);
+        console.error('Error generating recap', error);
         throw error;
     }
 }

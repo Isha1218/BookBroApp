@@ -12,7 +12,7 @@ const Recap = ({ rendition, book }) => {
 
   useEffect(() => {
     const fetchRecap = async () => {
-      const prevChapters = await extractPrevChapters(rendition, book);
+      // const prevChapters = await extractPrevChapters(rendition, book);
       // const recap = await extractCurrPage(rendition);
       // const currChapter = await extractCurrChapter(rendition, book);
       // const recapContext = prevChapters + currChapter;

@@ -1,6 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import extractPrevChapters from "../../../services/ExtractPrevChapters";
+import extractCurrChapter from "../../../services/ExtractCurrChapter";
+import extractCurrPage from "../../../services/ExtractCurrPage";
+import doLookUp from "../../../api/llm/LookUpApi";
 
-const LookUp = () => {
+const LookUp = ({ selectedText, book, rendition }) => {
+    const [lookUpType, setLookUpType] = useState("");
+    const [lookUpText, setLookUpText] = useState("");
+
+    useEffect(() => {
+        const fetchLookUp = async () => {
+            const prevChapters = await extractPrevChapters(rendition, book);
+            const currChapter = await extractCurrChapter(rendition, book);
+            const currPage = await extractCurrPage(rendition);
+            const lookUpContext = prevChapters + currChapter + currPage;
+            const { lookUpText, lookUpType } = await doLookUp(selectedText, lookUpContext);
+            setLookUpText(lookUpText);
+            setLookUpType(lookUpType);
+        };
+
+        fetchLookUp();
+    }, []);
+
     return (
         <div style={{ width: "95%", overflowY: "auto", maxHeight: "100%" }}>
             <div style={{
@@ -17,14 +38,14 @@ const LookUp = () => {
                     margin: 0,
                     fontFamily: 'Libre Caslon Text'
                 }}>
-                cassian
+                {selectedText.toLowerCase()}
                 </p>
                 <p style={{
                     margin: 0,
                     fontSize: '20px',
                     fontFamily: 'Libre Caslon Text'
                 }}>
-                    character
+                    {lookUpType.toLowerCase()}
                 </p>
             </div>
             <p
@@ -34,7 +55,7 @@ const LookUp = () => {
               lineHeight: "1.6",
               fontFamily: "Libre Caslon Text"
             }}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                {lookUpText.toLowerCase()}
             </p>
         </div>
       );

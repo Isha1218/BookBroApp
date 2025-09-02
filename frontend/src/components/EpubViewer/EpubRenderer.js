@@ -256,6 +256,7 @@ const EpubRenderer = () => {
           onNavigate={handleNavigate}
           currIndex={currentIndex}
           book={bookRef.current}
+          rendition={renditionRef.current}
           featureModalIndex={featureModalIndex}
         />
       )}

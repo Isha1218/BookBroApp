@@ -1,28 +1,37 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
+import extractPrevChapters from "../../../services/ExtractPrevChapters";
+import extractCurrPage from "../../../services/ExtractCurrPage";
+import extractCurrChapter from "../../../services/ExtractCurrChapter";
 
-const Recap = ({ }) => {
+const Recap = ({ rendition, book }) => {
   const [displayedText, setDisplayedText] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
-  
-  const contentText = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.`;
+  const [recapText, setRecapText] = useState("");
 
   useEffect(() => {
-    if (currentIndex < contentText.length) {
+    const fetchRecap = async () => {
+      // const recap = await extractPrevChapters(rendition, book);
+      // const recap = await extractCurrPage(rendition);
+      const recap = await extractCurrChapter(rendition, book);
+      setRecapText(recap);
+    };
+
+    fetchRecap();
+  }, []);
+
+  useEffect(() => {
+    if (currentIndex < recapText.length) {
       const timeout = setTimeout(() => {
-        setDisplayedText(prev => prev + contentText[currentIndex]);
+        setDisplayedText(prev => prev + recapText[currentIndex]);
         setCurrentIndex(prev => prev + 1);
       }, 30);
       
       return () => clearTimeout(timeout);
     }
-  }, [currentIndex, contentText]);
+  }, [currentIndex, recapText]);
 
   const formatContentText = (text) => {
-    const paragraphs = text.split('\n\n');
+    const paragraphs = text.split('\n');
     
     return paragraphs.map((paragraph, index) => {
       if (paragraph.trim()) {

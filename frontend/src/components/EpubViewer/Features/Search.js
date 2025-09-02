@@ -9,21 +9,23 @@ const SearchResultItem = ({ chapter, context, cfi, onNavigate }) => {
     };
     
     return (
-        <div 
+        <button
+            onClick={handleClick}
             style={{
-                padding: '20px 0px',
+                all: 'unset',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '5px',
+                padding: '20px 0',
                 width: '95%',
                 margin: '0 auto',
                 borderBottom: '1px solid #eee',
-                cursor: cfi ? 'pointer' : 'default',
                 boxSizing: 'border-box',
                 overflowWrap: 'break-word',
-                wordWrap: 'break-word'
+                wordWrap: 'break-word',
+                cursor: cfi ? 'pointer' : 'default',
+                textAlign: 'left',
             }}
-            onClick={handleClick}
         >
             <p style={{
                 margin: 0,
@@ -39,8 +41,8 @@ const SearchResultItem = ({ chapter, context, cfi, onNavigate }) => {
                 wordWrap: 'break-word',
                 whiteSpace: 'normal'
             }}>{chapter}</p>
-        </div>
-    );
+        </button>
+    );    
 };
 
 const SearchBar = ({ onSearch, isSearching }) => {

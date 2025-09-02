@@ -7,11 +7,11 @@ import Settings from "../Features/Settings";
 import TableOfContents from "../Features/TableOfContents";
 import React from "react";
 
-const ViewFeatureModal = ({ onCloseFeatureModal, toc, onNavigate, currIndex, book, featureModalIndex }) => {
+const ViewFeatureModal = ({ onCloseFeatureModal, toc, onNavigate, currIndex, book, rendition, featureModalIndex }) => {
     const features = [
         <TableOfContents toc={toc} onNavigate={onNavigate} currIndex={currIndex}/>,
         <Chat/>,
-        <Recap/>,
+        <Recap book={book} rendition={rendition}/>,
         <Roleplay/>,
         <Search book={book} toc={toc} onNavigate={onNavigate} />,
         <LookUp/>

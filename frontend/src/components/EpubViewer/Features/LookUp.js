@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import extractPrevChapters from "../../../services/ExtractPrevChapters";
 import extractCurrChapter from "../../../services/ExtractCurrChapter";
 import extractCurrPage from "../../../services/ExtractCurrPage";
@@ -8,7 +8,12 @@ const LookUp = ({ selectedText, book, rendition }) => {
     const [lookUpType, setLookUpType] = useState("");
     const [lookUpText, setLookUpText] = useState("");
 
+    const fetchLookUpRef = useRef(false);
+
     useEffect(() => {
+        if (fetchLookUpRef.current) return;
+        fetchLookUpRef.current = true;
+        
         const fetchLookUp = async () => {
             const prevChapters = await extractPrevChapters(rendition, book);
             const currChapter = await extractCurrChapter(rendition, book);

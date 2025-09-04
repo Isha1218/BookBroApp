@@ -50,6 +50,7 @@ class LLMService:
                     temperature=0.5,
                 )
             )
+            print(f'character lookup text {response.text}')
             return response.text
         except Exception as e:
             print(f"Error in lookup: {e}")
@@ -66,6 +67,7 @@ class LLMService:
                     response_mime_type="application/json"
                 )
             )
+            print(f'character lookup json: {response.text}')
             lookup_text = self._JSON_to_text(response.text, context)
             return lookup_text
         except Exception as e:
@@ -75,9 +77,22 @@ class LLMService:
     def lookup(self, selected_text, lookup_context):
         try:
             db = self._store_chunks(lookup_context)
-            results = db.similarity_search_with_score(selected_text, k=5)
-            context = "\n\n---\n\n".join([doc.page_content for doc, _score in results])
-            
+            results = db.similarity_search_with_score(selected_text, k=10)
+            context_list = [doc.page_content for doc, _score in results if selected_text.lower() in doc.page_content.lower()]
+            context = "\n\n---\n\n".join(context_list)
+            if not context_list:
+                lower_context = lookup_context.lower()
+                lower_selected = selected_text.lower()
+                start_idx = lower_context.find(lower_selected)
+
+                if start_idx == -1:
+                    return "Unable to perform lookup"
+                else:
+                    window_size = 1000
+                    start_char = max(start_idx - window_size, 0)
+                    end_char = min(start_idx + len(selected_text) + window_size, len(lookup_context))
+                    context = lookup_context[start_char:end_char]
+
             prompt_template = ChatPromptTemplate.from_template(LOOKUP_TYPE_PROMPT_TEMPLATE)
             prompt = prompt_template.format(phrase=selected_text, context=context)
 
@@ -89,8 +104,8 @@ class LLMService:
                     max_output_tokens=1
                 )
             )
-
             result = response.text if response.text else "N/A"
+            print(f'type: {result}')
             if result == 'character':
                 return self._character_lookup(selected_text, context), 'character'
             return "Not character"

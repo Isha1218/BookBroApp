@@ -21,8 +21,8 @@ and return the result in valid JSON format.
 
 Follow this structure exactly:
 {{
-    "name": string,                  // the character's full name or main identifier
-    "role": string,                  // their role in the story (e.g. protagonist, antagonist, mentor, side character, etc.)
+    "name": string,                   // the character's full name or main identifier
+    "role": string,                   // their role in the story (e.g. protagonist, antagonist, mentor, side character, etc.)
     "relationships": {{               // key = another character's name, value = type of relationship
         "Character A": "friend",
         "Character B": "enemy",
@@ -62,7 +62,6 @@ Example output:
     ]
 }}
 """
-
 
 JSON_TO_PARAGRAPH_TEMPLATE = """
 You are a literary analyst. Your task is to turn a JSON character analysis into a natural, engaging paragraph.  

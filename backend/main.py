@@ -2,6 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api_routes import router
 
+# run with:
+# python -m uvicorn main:app --host 0.0.0.0 --port 5000 --reload
+
 app = FastAPI()
 origins = [
     "http://192.168.0.19:3000",  # your dev server

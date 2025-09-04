@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { LuSearch } from "react-icons/lu";
 
 const SearchResultItem = ({ chapter, context, cfi, onNavigate }) => {
@@ -117,9 +117,13 @@ const SearchBar = ({ onSearch, isSearching }) => {
 };
 
 const Search = ({ book, toc, onNavigate }) => {
-    const [searchResults, setSearchResults] = useState([]);
+    const [allSearchResults, setAllSearchResults] = useState([]);
+    const [displayedResults, setDisplayedResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const scrollContainerRef = useRef(null);
+    const ITEMS_PER_PAGE = 50;
 
     const getChapterName = (href) => {
         if (!toc || toc.length === 0) return 'Unknown Chapter';
@@ -143,45 +147,107 @@ const Search = ({ book, toc, onNavigate }) => {
         return findInToc(toc) || 'Unknown Chapter';
     };
 
+    const loadMoreResults = useCallback(() => {
+        if (isLoadingMore || displayedResults.length >= allSearchResults.length) return;
+
+        setIsLoadingMore(true);
+        
+        setTimeout(() => {
+            const nextBatch = allSearchResults.slice(
+                displayedResults.length, 
+                displayedResults.length + ITEMS_PER_PAGE
+            );
+            setDisplayedResults(prev => [...prev, ...nextBatch]);
+            setIsLoadingMore(false);
+        }, 100);
+    }, [allSearchResults, displayedResults.length, isLoadingMore]);
+
+    const handleScroll = useCallback(() => {
+        if (!scrollContainerRef.current || isLoadingMore) return;
+
+        const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+        const threshold = 200;
+
+        if (scrollHeight - scrollTop - clientHeight < threshold) {
+            loadMoreResults();
+        }
+    }, [loadMoreResults, isLoadingMore]);
+
+    useEffect(() => {
+        const container = scrollContainerRef.current;
+        if (!container) return;
+
+        container.addEventListener('scroll', handleScroll);
+        return () => container.removeEventListener('scroll', handleScroll);
+    }, [handleScroll]);
+
     const performSearch = async (query) => {
         if (!book || !query) {
-            setSearchResults([]);
+            setAllSearchResults([]);
+            setDisplayedResults([]);
             setHasSearched(false);
             return;
         }
 
         setIsSearching(true);
         setHasSearched(true);
+        setAllSearchResults([]);
+        setDisplayedResults([]);
 
         try {
             const searchResults = [];
+            const spineItems = book.spine.spineItems || [];
             
-            for (let i = 0; i < book.spine.length; i++) {
-                const spineItem = book.spine.get(i);
+            for (let i = 0; i < spineItems.length; i++) {
+                const spineItem = spineItems[i];
+                
                 try {
-                    await spineItem.load(book.load.bind(book));
-                    const results = spineItem.find(query);
-                    for (const result of results) {
-                        const chapterName = getChapterName(spineItem.href);
-                        const excerpt = result.excerpt || '';
-                        searchResults.push({
-                            id: `${i}-${searchResults.length}`,
-                            context: excerpt,
-                            chapter: chapterName,
-                            cfi: result.cfi,
-                            href: spineItem.href
-                        });
+                    if (!spineItem.loaded) {
+                        await spineItem.load(book.load.bind(book));
                     }
-                    spineItem.unload();
+                    
+                    const results = spineItem.find(query);
+                    
+                    if (results && results.length > 0) {
+                        const chapterName = getChapterName(spineItem.href);
+                        
+                        for (const result of results) {
+                            const excerpt = result.excerpt || '';
+                            
+                            searchResults.push({
+                                id: `${i}-${searchResults.length}`,
+                                context: excerpt,
+                                chapter: chapterName,
+                                cfi: result.cfi,
+                                href: spineItem.href,
+                                spineIndex: i
+                            });
+                        }
+                    }
+                    
+                    if (spineItem.loaded) {
+                        setTimeout(() => {
+                            spineItem.unload();
+                        }, 100);
+                    }
+                    
                 } catch (chapterError) {
-                    console.warn('Error searching chapter:', spineItem.href, chapterError);
+                    console.warn(`Error searching chapter ${i} (${spineItem.href}):`, chapterError);
+                    continue;
+                }
+
+                if (i % 3 === 0) {
+                    await new Promise(resolve => setTimeout(resolve, 5));
                 }
             }
 
-            setSearchResults(searchResults);
+            setAllSearchResults(searchResults);
+            setDisplayedResults(searchResults.slice(0, ITEMS_PER_PAGE));
+            
         } catch (error) {
             console.error('Search error:', error);
-            setSearchResults([]);
+            setAllSearchResults([]);
+            setDisplayedResults([]);
         } finally {
             setIsSearching(false);
         }
@@ -194,7 +260,15 @@ const Search = ({ book, toc, onNavigate }) => {
     };
 
     return (
-        <div style={{ width: "95%", overflowY: "auto", overflowX: "hidden", maxHeight: "100%"}}>
+        <div 
+            ref={scrollContainerRef}
+            style={{ 
+                width: "95%", 
+                overflowY: "auto", 
+                overflowX: "hidden", 
+                maxHeight: "100%"
+            }}
+        >
             <p
                 style={{
                 fontSize: "25px",
@@ -211,7 +285,7 @@ const Search = ({ book, toc, onNavigate }) => {
             
             {hasSearched && !isSearching && (
                 <div style={{ marginTop: '20px' }}>
-                    {searchResults.length > 0 ? (
+                    {allSearchResults.length > 0 ? (
                         <>
                             <p style={{
                                 margin: '10px 0',
@@ -219,9 +293,9 @@ const Search = ({ book, toc, onNavigate }) => {
                                 fontSize: '14px',
                                 paddingLeft: '20px'
                             }}>
-                                Found {searchResults.length} result{searchResults.length !== 1 ? 's' : ''}
+                                Found {allSearchResults.length} result{allSearchResults.length !== 1 ? 's' : ''}
                             </p>
-                            {searchResults.map((result) => (
+                            {displayedResults.map((result) => (
                                 <SearchResultItem
                                     key={result.id}
                                     chapter={result.chapter}
@@ -230,6 +304,36 @@ const Search = ({ book, toc, onNavigate }) => {
                                     onNavigate={handleNavigateToResult}
                                 />
                             ))}
+                            {isLoadingMore && (
+                                <div style={{
+                                    padding: '20px',
+                                    textAlign: 'center',
+                                    color: '#666',
+                                    fontSize: '14px'
+                                }}>
+                                    Loading more results...
+                                </div>
+                            )}
+                            {displayedResults.length < allSearchResults.length && !isLoadingMore && (
+                                <div style={{
+                                    padding: '20px',
+                                    textAlign: 'center'
+                                }}>
+                                    <button
+                                        onClick={loadMoreResults}
+                                        style={{
+                                            padding: '10px 20px',
+                                            backgroundColor: '#f0f0f0',
+                                            border: '1px solid #ddd',
+                                            borderRadius: '5px',
+                                            cursor: 'pointer',
+                                            fontSize: '14px'
+                                        }}
+                                    >
+                                        Load More Results
+                                    </button>
+                                </div>
+                            )}
                         </>
                     ) : (
                         <p style={{

@@ -46,8 +46,20 @@ const EpubRenderer = () => {
     return minFont + ((width - minWidth) / (maxWidth - minWidth)) * (maxFont - minFont);
   };
 
-  const handleNavigate = useCallback((href) => {
-    renditionRef.current.display(href);
+  const handleNavigate = useCallback(async (target) => {
+    if (!renditionRef.current || !bookRef.current) {
+      return;
+    }
+  
+    try {
+      await bookRef.current.ready;
+      await renditionRef.current.display(target);
+      await new Promise(resolve => setTimeout(resolve, 50));
+      // we have to call twice to display correctly -> it's weird
+      await renditionRef.current.display(target);
+    } catch (error) {
+      console.error('Navigation failed:', error);
+    }
   }, []);
 
   const handleShowFeatureModal = useCallback((index) => {

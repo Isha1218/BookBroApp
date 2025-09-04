@@ -1,4 +1,4 @@
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect, use, useRef } from "react";
 import extractPrevChapters from "../../../services/ExtractPrevChapters";
 import extractCurrPage from "../../../services/ExtractCurrPage";
 import extractCurrChapter from "../../../services/ExtractCurrChapter";
@@ -10,7 +10,12 @@ const Recap = ({ rendition, book }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [recapText, setRecapText] = useState("");
 
+  const fetchRecapRef = useRef(false);
+
   useEffect(() => {
+    if (fetchRecapRef.current) return;
+    fetchRecapRef.current = true;
+    
     const fetchRecap = async () => {
       // const prevChapters = await extractPrevChapters(rendition, book);
       // const recap = await extractCurrPage(rendition);

@@ -1,5 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { LuSend } from "react-icons/lu";
+import doAskBro from "../../../api/llm/AskBroApi";
+import extractCurrChapter from "../../../services/ExtractCurrChapter";
+import extractPrevChapters from "../../../services/ExtractPrevChapters";
+import extractCurrPage from "../../../services/ExtractCurrPage";
 
 const ChatMessage = ({ message, isUser }) => {
     return (
@@ -30,9 +34,7 @@ const ChatMessage = ({ message, isUser }) => {
 const MessageInput = ({ onSendMessage, isLoading }) => {
     const [message, setMessage] = useState('');
 
-    const handleInputChange = (e) => {
-        setMessage(e.target.value);
-    };
+    const handleInputChange = (e) => setMessage(e.target.value);
 
     const handleSend = () => {
         if (message.trim() && !isLoading) {
@@ -102,7 +104,7 @@ const MessageInput = ({ onSendMessage, isLoading }) => {
     );
 };
 
-const Chat = () => {
+const Chat = ({ book, rendition }) => {
     const [messages, setMessages] = useState([
         { id: 1, text: "Hey! I'm Bro, your reading companion. Ask me anything about the book you're reading!", isUser: false }
     ]);
@@ -125,16 +127,30 @@ const Chat = () => {
         setMessages(prev => [...prev, userMessage]);
         setIsLoading(true);
 
-        setTimeout(() => {
+        try {
+            const prevChapters = await extractPrevChapters(rendition, book);
+            const currChapter = await extractCurrChapter(rendition, book);
+            const currPage = await extractCurrPage(rendition);
+            const askBroContext = prevChapters + currChapter + currPage;
+            const response = await doAskBro(messageText, askBroContext);
+
             const botResponse = {
                 id: Date.now() + 1,
-                text: "That's an interesting question! I'd love to help you explore that topic from the book. As an AI reading companion, I can discuss themes, characters, and plot points with you.",
+                text: response,
                 isUser: false
             };
-            
+
             setMessages(prev => [...prev, botResponse]);
+        } catch (error) {
+            const errorMessage = {
+                id: Date.now() + 1,
+                text: "Oops! Something went wrong while asking Bro.",
+                isUser: false
+            };
+            setMessages(prev => [...prev, errorMessage]);
+        } finally {
             setIsLoading(false);
-        }, 1500);
+        }
     };
 
     return (

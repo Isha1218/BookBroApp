@@ -6,6 +6,7 @@ from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from prompt_templates.recap_template import RECAP_TEMPLATE
 from prompt_templates.lookup_template import LOOKUP_TYPE_PROMPT_TEMPLATE, LOOKUP_CHARACTER_PROMPT_TEMPLATE, JSON_TO_PARAGRAPH_CHARACTER_TEMPLATE, LOOKUP_PLACE_PROMPT_TEMPLATE, JSON_TO_PARAGRAPH_LOCATION_TEMPLATE, LOOKUP_EVENT_PROMPT_TEMPLATE, JSON_TO_PARAGRAPH_EVENT_TEMPLATE, LOOKUP_OBJECT_PROMPT_TEMPLATE, JSON_TO_PARAGRAPH_OBJECT_TEMPLATE, LOOKUP_GROUP_PROMPT_TEMPLATE, JSON_TO_PARAGRAPH_GROUP_TEMPLATE
+from prompt_templates.ask_bro_template import ASK_BRO_PROMPT_TEMPLATE
 
 class LLMService:
     def __init__(self):
@@ -21,9 +22,10 @@ class LLMService:
     
     def _store_chunks(self, text):
         chunks = self.text_splitter.split_text(text=text)
-        vector_db = FAISS.from_texts(chunks, self.embeddings)
+        metadatas = [{"chunk_id": i} for i in range(len(chunks))]
+        vector_db = FAISS.from_texts(chunks, self.embeddings, metadatas=metadatas)
         return vector_db
-    
+
     def recap(self, recap_context):
         try:
             prompt_template = ChatPromptTemplate.from_template(RECAP_TEMPLATE)
@@ -121,4 +123,28 @@ class LLMService:
             return "Cannot perform lookup", 'none'
         except Exception as e:
             print(f"Error in lookup: {e}")
+            raise e
+    
+    def ask_bro(self, question, ask_bro_context):
+        try:
+            db = self._store_chunks(ask_bro_context)
+            results = db.similarity_search_with_score(question, k=5)
+            results = sorted(results, key=lambda x: x[0].metadata["chunk_id"])
+            print('this is the results ' + str(len(results)))
+            context_list = [doc.page_content for doc, _score in results]
+            context = "\n\n---\n\n".join(context_list)
+            print('this is the context ' + context)
+            prompt_template = ChatPromptTemplate.from_template(ASK_BRO_PROMPT_TEMPLATE)
+            prompt = prompt_template.format(question=question, context=context)
+            response = self.model.generate_content(
+                prompt,
+                generation_config=genai.types.GenerationConfig(
+                    temperature=0.5,
+                )
+            )
+            print(response.text)
+            return response.text
+
+        except Exception as e:
+            print(f"Error in ask bro: {e}")
             raise e

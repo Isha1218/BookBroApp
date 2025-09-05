@@ -1,4 +1,4 @@
-import Chat from "../Features/Chat";
+import Chat from "../Features/AskBro";
 import LookUp from "../Features/LookUp";
 import Recap from "../Features/Recap";
 import Roleplay from "../Features/Roleplay";
@@ -10,7 +10,7 @@ import React from "react";
 const ViewFeatureModal = ({ onCloseFeatureModal, toc, onNavigate, currIndex, book, rendition, featureModalIndex, selectedText = '' }) => {
     const features = [
         <TableOfContents toc={toc} onNavigate={onNavigate} currIndex={currIndex}/>,
-        <Chat/>,
+        <Chat book={book} rendition={rendition}/>,
         <Recap book={book} rendition={rendition}/>,
         <Roleplay/>,
         <Search book={book} toc={toc} onNavigate={onNavigate} />,

@@ -12,7 +12,7 @@ const ViewFeatureModal = ({ onCloseFeatureModal, toc, onNavigate, currIndex, boo
         <TableOfContents toc={toc} onNavigate={onNavigate} currIndex={currIndex}/>,
         <Chat book={book} rendition={rendition}/>,
         <Recap book={book} rendition={rendition}/>,
-        <Roleplay/>,
+        <Roleplay book={book} rendition={rendition}/>,
         <Search book={book} toc={toc} onNavigate={onNavigate} />,
         <LookUp book={book} rendition={rendition} selectedText={selectedText}/>
     ];

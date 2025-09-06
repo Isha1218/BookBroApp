@@ -1,4 +1,5 @@
 import google.generativeai as genai
+import json
 from langchain_core.prompts import ChatPromptTemplate
 from consts.api_keys import APIKEY
 from langchain_community.vectorstores import FAISS
@@ -7,6 +8,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from prompt_templates.recap_template import RECAP_TEMPLATE
 from prompt_templates.lookup_template import LOOKUP_TYPE_PROMPT_TEMPLATE, LOOKUP_CHARACTER_PROMPT_TEMPLATE, JSON_TO_PARAGRAPH_CHARACTER_TEMPLATE, LOOKUP_PLACE_PROMPT_TEMPLATE, JSON_TO_PARAGRAPH_LOCATION_TEMPLATE, LOOKUP_EVENT_PROMPT_TEMPLATE, JSON_TO_PARAGRAPH_EVENT_TEMPLATE, LOOKUP_OBJECT_PROMPT_TEMPLATE, JSON_TO_PARAGRAPH_OBJECT_TEMPLATE, LOOKUP_GROUP_PROMPT_TEMPLATE, JSON_TO_PARAGRAPH_GROUP_TEMPLATE
 from prompt_templates.ask_bro_template import ASK_BRO_PROMPT_TEMPLATE
+from prompt_templates.roleplay_template import CREATE_ROLEPLAY_SCENES_TEMPLATE
 
 class LLMService:
     def __init__(self):
@@ -144,6 +146,25 @@ class LLMService:
             )
             print(response.text)
             return response.text
+
+        except Exception as e:
+            print(f"Error in ask bro: {e}")
+            raise e
+        
+    def create_roleplay_scenes(self, roleplay_context):
+        try:
+            prompt_template = ChatPromptTemplate.from_template(CREATE_ROLEPLAY_SCENES_TEMPLATE)
+            prompt = prompt_template.format(recent_pages_context=roleplay_context)
+            response = self.model.generate_content(
+                prompt,
+                generation_config=genai.types.GenerationConfig(
+                    temperature=0.5,
+                    response_mime_type="application/json"
+                )
+            )
+            print('roleplay scenes ' + response.text)
+            json_response = json.loads(response.text)
+            return json_response 
 
         except Exception as e:
             print(f"Error in ask bro: {e}")

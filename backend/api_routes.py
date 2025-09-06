@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from models.recap_model import Recap
 from models.lookup_model import LookUp
 from models.ask_bro_model import AskBro
+from models.roleplay_model import Roleplay
 from services.llm_service import LLMService
 
 router = APIRouter(prefix="/api")
@@ -29,5 +30,13 @@ def do_ask_bro(ask_bro: AskBro):
     try:
         resp = llm_service.ask_bro(ask_bro.question, ask_bro.ask_bro_context)
         return {"status": "success", "ask_bro_text": resp}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.post('/create_roleplay_scenes')
+def create_roleplay_scenes(roleplay: Roleplay):
+    try:
+        resp = llm_service.create_roleplay_scenes(roleplay.roleplay_context)
+        return {"status": "success", "roleplay_scenes": resp}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

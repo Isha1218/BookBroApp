@@ -1,27 +1,23 @@
 import React, { useState, useRef, useEffect } from "react";
 import { LuSend, LuArrowLeft } from "react-icons/lu";
+import createRoleplayScenes from "../../../api/llm/RoleplayApi";
+import extractCurrChapter from "../../../services/ExtractCurrChapter";
+import extractPrevChapter from "../../../services/ExtractPrevChapter";
+import { IoColorWandSharp } from "react-icons/io5";
 
-const CharacterCard = ({ character, onSelect }) => {
+const CharacterCard = ({ character, backgroundColor, onSelect }) => {
+
     return (
         <div 
             style={{
                 padding: '20px',
-                backgroundColor: '#f8f8f8',
+                // backgroundColor: '#f8f8f8',
                 borderRadius: '12px',
                 margin: '10px 0',
                 cursor: 'pointer',
                 border: '1px solid #e0e0e0',
-                transition: 'all 0.2s ease'
             }}
             onClick={() => onSelect(character)}
-            onMouseEnter={(e) => {
-                e.target.style.backgroundColor = '#ececec';
-                e.target.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-                e.target.style.backgroundColor = '#f8f8f8';
-                e.target.style.transform = 'translateY(0)';
-            }}
         >
             <div style={{
                 display: 'flex',
@@ -32,7 +28,7 @@ const CharacterCard = ({ character, onSelect }) => {
                     width: '50px',
                     height: '50px',
                     borderRadius: '50%',
-                    backgroundColor: character.color,
+                    backgroundColor: backgroundColor,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -40,7 +36,7 @@ const CharacterCard = ({ character, onSelect }) => {
                     color: 'white',
                     fontWeight: 'bold'
                 }}>
-                    {character.name.charAt(0)}
+                    {character['character'].charAt(0)}
                 </div>
                 <div style={{ flex: 1 }}>
                     <h3 style={{
@@ -49,15 +45,16 @@ const CharacterCard = ({ character, onSelect }) => {
                         fontWeight: '600',
                         color: '#333'
                     }}>
-                        {character.name}
+                        {character['character']}
                     </h3>
                     <p style={{
                         margin: 0,
                         fontSize: '14px',
                         color: '#666',
-                        lineHeight: '1.4'
+                        lineHeight: '1.4',
+                        fontStyle: "italic"
                     }}>
-                        {character.description}
+                        Scene: {character['scene']}
                     </p>
                 </div>
             </div>
@@ -235,53 +232,37 @@ const MessageInput = ({ onSendMessage, isLoading, character }) => {
     );
 };
 
-const Roleplay = ({ currentBookProgress = 45 }) => {
-    const availableCharacters = [
-        {
-            id: 'nesta',
-            name: 'Nesta Archeron',
-            description: 'Fierce and independent eldest sister with a sharp tongue and hidden depths.',
-            color: '#8B0000',
-            scenes: {
-                early: "You encounter Nesta in the Human Lands, her walls firmly up as she struggles with her new reality.",
-                mid: "Nesta is training with the Valkyries, finding her strength and purpose through combat and sisterhood.",
-                late: "Nesta has embraced her power, standing confident as a fierce protector of those she loves."
-            }
-        },
-        {
-            id: 'cassian',
-            name: 'Cassian',
-            description: 'Illyrian warrior and General with a heart of gold beneath his tough exterior.',
-            color: '#4169E1',
-            scenes: {
-                early: "Cassian is trying to help train you, his patience tested but his determination unwavering.",
-                mid: "You find Cassian in the training ring, sweat glistening as he works through his own demons.",
-                late: "Cassian approaches with newfound understanding, ready to face whatever challenges lie ahead together."
-            }
-        },
-        {
-            id: 'azriel',
-            name: 'Azriel',
-            description: 'Mysterious shadowsinger with secrets hidden behind his quiet demeanor.',
-            color: '#2F4F4F',
-            scenes: {
-                early: "Azriel emerges from the shadows, his hazel eyes observing everything while revealing nothing.",
-                mid: "You catch Azriel in a rare moment of vulnerability, his shadows restless around him.",
-                late: "Azriel stands ready for battle, his shadows dancing as he prepares for what's to come."
-            }
-        },
-        {
-            id: 'rhysand',
-            name: 'Rhysand',
-            description: 'High Lord of the Night Court, powerful and cunning with deep loyalty to his inner circle.',
-            color: '#4B0082',
-            scenes: {
-                early: "Rhysand regards you with calculating violet eyes, weighing your potential and worth.",
-                mid: "The High Lord of Night Court seeks counsel, the weight of leadership evident in his posture.",
-                late: "Rhysand prepares for the final confrontation, his power radiating as he stands with his court."
-            }
-        }
-    ];
+const Roleplay = ({ currentBookProgress = 45, book, rendition }) => {
+
+    const [scenes, setScenes] = useState([]);
+    const [characterColors, setCharacterColors] = useState({});
+
+    const getCharacterColor = () => {
+        const randomHex = Math.floor(Math.random() * 16777215).toString(16);
+        const paddedHex = '#' + randomHex.padStart(6, '0'); 
+        return paddedHex
+    };
+
+    useEffect(() => {
+        // if (fetchRecapRef.current) return;
+        // fetchRecapRef.current = true;
+        
+        const fetchRoleplayScenes = async () => {
+          const prevChapter = await extractPrevChapter(rendition, book);
+          const currChapter = await extractCurrChapter(rendition, book);
+          const roleplayContext = prevChapter + currChapter;
+          const scenes = await createRoleplayScenes(roleplayContext)
+          setScenes(scenes)
+
+          const colors = {}
+          scenes.forEach((character) => {
+            colors[character['character']] = getCharacterColor()
+          })
+          setCharacterColors(colors)
+        };
+    
+        fetchRoleplayScenes();
+      }, []);
 
     const [selectedCharacter, setSelectedCharacter] = useState(null);
     const [messages, setMessages] = useState([]);
@@ -384,7 +365,6 @@ const Roleplay = ({ currentBookProgress = 45 }) => {
     };
 
     if (!selectedCharacter) {
-        // Character selection screen
         return (
             <div style={{ 
                 width: "95%", 
@@ -411,16 +391,19 @@ const Roleplay = ({ currentBookProgress = 45 }) => {
                     margin: '0 0 20px 0',
                     lineHeight: '1.4'
                 }}>
-                    Choose a character to roleplay with. The scene will be set based on your current reading progress ({currentBookProgress}%).
+                    Choose a character to talk with. The scene will be set based on your current reading progress.
                 </p>
                 
-                {availableCharacters.map((character) => (
+                {scenes.map((character) => {
+                    const backgroundColor = characterColors[character['character']];
+                    return (
                     <CharacterCard
-                        key={character.id}
+                        key={character['character']}
                         character={character}
+                        backgroundColor={backgroundColor}
                         onSelect={handleCharacterSelect}
                     />
-                ))}
+                )})}
             </div>
         );
     }

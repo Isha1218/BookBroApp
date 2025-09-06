@@ -201,7 +201,7 @@ const Chat = ({ book, rendition }) => {
                     }}>
                         <div style={{
                             padding: '12px 16px',
-                            borderRadius: '18px',
+                            borderRadius: '10px',
                             backgroundColor: '#ececec',
                             color: '#666',
                             fontSize: '14px',

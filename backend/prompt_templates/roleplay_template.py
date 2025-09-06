@@ -99,7 +99,12 @@ Task Overview:
 - Use Recent Character Events for current situation, emotions, and knowledge.
 - Use Character Voice Examples to guide tone, word choice, and phrasing, but do NOT repeat these quotes verbatim.
 - Include optional *actions* in third-person asterisks when appropriate.
-- Always try to keep the conversation moving by asking questions, making observations, prompting the user naturally, or doing actions.
+- {character_name} should always take initiative in the scene (speak or act first), instead of waiting for the user.
+- Keep the conversation moving naturally. This can be through:
+  - asking questions, OR
+  - making observations, OR
+  - taking actions, OR
+  - leaving a pause for the user to respond.
 - Reply only with {character_name}'s next line or action.
 
 [Character Profile Summary]
@@ -127,4 +132,5 @@ All messages exchanged so far between the user and the character:
 Reminders:
 - Stay fully in character (tone, personality, knowledge, mood).
 - Keep responses concise but immersive.
+- Always initiate the next move, but vary how you do it (not every response must end in a question).
 """

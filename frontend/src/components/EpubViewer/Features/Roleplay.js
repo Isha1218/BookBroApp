@@ -3,7 +3,6 @@ import { LuSend, LuArrowLeft } from "react-icons/lu";
 import { createRoleplayScenes, createCharacterBrief, doRoleplay } from "../../../api/llm/RoleplayApi";
 import extractCurrChapter from "../../../services/ExtractCurrChapter";
 import extractPrevChapter from "../../../services/ExtractPrevChapter";
-import { IoColorWandSharp } from "react-icons/io5";
 import extractPrevChapters from "../../../services/ExtractPrevChapters";
 
 const CharacterCard = ({ character, onSelect }) => {
@@ -31,7 +30,7 @@ const CharacterCard = ({ character, onSelect }) => {
                     height: '50px',
                     borderRadius: '50%',
                     border: '1px solid #e0e0e0',
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    backgroundColor: character['backgroundColor'],
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -65,8 +64,8 @@ const CharacterCard = ({ character, onSelect }) => {
     );
 };
 
-const SceneHeader = ({ scene}) => {
-    const characterName = scene?.character || scene?.name || 'Unknown';
+const SceneHeader = ({ scene }) => {
+    const characterName = scene?.character || 'Unknown';
     const sceneName = scene?.scene || 'No scene';
 
     return (
@@ -87,7 +86,7 @@ const SceneHeader = ({ scene}) => {
                     width: '30px',
                     height: '30px',
                     borderRadius: '50%',
-                    backgroundColor: 'black',
+                    backgroundColor: scene['backgroundColor'],
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -119,7 +118,7 @@ const SceneHeader = ({ scene}) => {
 };
 
 const RoleplayMessage = ({ role, content, scene }) => {
-    const characterName = scene?.character || scene?.name || 'Unknown';
+    const characterName = scene?.character || 'Unknown';
 
     return (
         <div style={{
@@ -133,7 +132,7 @@ const RoleplayMessage = ({ role, content, scene }) => {
                     width: '32px',
                     height: '32px',
                     borderRadius: '50%',
-                    backgroundColor: 'black',
+                    backgroundColor: scene['backgroundColor'],
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -235,7 +234,7 @@ const MessageInput = ({ onSendMessage, isLoading, scene }) => {
                     padding: '4px'
                 }}
             >
-                <LuSend />
+                <LuSend color="black"/>
             </button>
         </div>
     );
@@ -253,6 +252,13 @@ const Roleplay = ({ book, rendition }) => {
     const chatContainerRef = useRef(null);
     const createRoleplayScenesRef = useRef(null);
 
+    const bgColors = [
+        '#1BAFD0',
+        '#FD636B',
+        '#FFB900',
+        '#B1D877',
+    ]
+
     useEffect(() => {
         if (createRoleplayScenesRef.current) return;
         createRoleplayScenesRef.current = true;
@@ -266,7 +272,13 @@ const Roleplay = ({ book, rendition }) => {
                 const scenes = await createRoleplayScenes(roleplayContext);
                 
                 const scenesArray = Array.isArray(scenes) ? scenes : [];
-                setScenes(scenesArray);
+
+                const updatedScenes = scenesArray.map((scene, index) => ({
+                    ...scene,
+                    backgroundColor: bgColors[index % bgColors.length],
+                }));
+
+                setScenes(updatedScenes);
             } catch (error) {
                 console.error('Error fetching roleplay scenes:', error);
                 setScenes([]);
@@ -508,7 +520,7 @@ const Roleplay = ({ book, rendition }) => {
                             width: '32px',
                             height: '32px',
                             borderRadius: '50%',
-                            backgroundColor: 'black',
+                            backgroundColor: selectedScene['backgroundColor'],
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -522,7 +534,7 @@ const Roleplay = ({ book, rendition }) => {
                         </div>
                         <div style={{
                             padding: '12px 16px',
-                            borderRadius: '18px',
+                            borderRadius: '10px',
                             backgroundColor: '#ececec',
                             color: '#666',
                             fontSize: '14px',

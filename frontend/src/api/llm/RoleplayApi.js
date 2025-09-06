@@ -2,7 +2,7 @@ import { IPADDRESS } from "../../consts/consts";
 
 const API_BASE_URL = 'http://' + IPADDRESS + ':5000';
 
-const createRoleplayScenes = async (roleplayContext) => {
+export const createRoleplayScenes = async (roleplayContext) => {
     try {
         const response = await fetch(`${API_BASE_URL}/api/create_roleplay_scenes`, {
             method: 'POST',
@@ -21,9 +21,63 @@ const createRoleplayScenes = async (roleplayContext) => {
         const data = await response.json();
         return data['roleplay_scenes'];
     } catch (error) {
-        console.error('Error generating recap', error);
+        console.error('Error creating roleplay scenes', error);
         throw error;
     }
 }
 
-export default createRoleplayScenes
+export const createCharacterBrief = async (characterName, sceneDescription, readText, recentChapterContext) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/create_character_brief`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                character_name: characterName,
+                scene_description: sceneDescription,
+                read_text: readText,
+                recent_chapter_context: recentChapterContext
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`${response.status}`)
+        }
+
+        const data = await response.json();
+        return data['character_brief'];
+    } catch (error) {
+        console.error('Error creating character brief', error);
+        throw error;
+    }
+}
+
+export const doRoleplay = async (characterName, characterBrief, sceneDescription, recentChapterContext, characterQuotes, messages) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/do_roleplay`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                character_name: characterName,
+                character_brief: characterBrief,
+                scene_description: sceneDescription,
+                recent_chapter_context: recentChapterContext,
+                character_quotes: characterQuotes,
+                messages: messages
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`${response.status}`)
+        }
+
+        const data = await response.json();
+        return data['roleplay_message'];
+    } catch (error) {
+        console.error('Error creating character brief', error);
+        throw error;
+    }
+}

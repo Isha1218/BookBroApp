@@ -87,8 +87,8 @@ const TopBar = forwardRef(({ showBar, onShowFeatureModal }, ref) => {
   
         <MenuItem icon={<LuList size={iconSize} color="#ababab"/>} label="Chapters" onShowFeatureModal={() => onShowFeatureModal(0)}/>
         <MenuItem icon={<IoChatboxEllipsesOutline size={iconSize} color="#ababab" />} label="Ask Bro" onShowFeatureModal={() => onShowFeatureModal(1)}/>
-        <MenuItem icon={<PiSkipBack size={iconSize} color="#ababab" />} label="Recap" onShowFeatureModal={() => onShowFeatureModal(2)}/>
-        <MenuItem icon={<LiaTheaterMasksSolid size={iconSize} color="#ababab" />} label="Roleplay" onShowFeatureModal={() => onShowFeatureModal(3)}/>
+        <MenuItem icon={<PiSkipBack size={iconSize} color="#ababab" />} label="Previously On" onShowFeatureModal={() => onShowFeatureModal(2)}/>
+        <MenuItem icon={<LiaTheaterMasksSolid size={iconSize} color="#ababab" />} label="Book Talk" onShowFeatureModal={() => onShowFeatureModal(3)}/>
         <MenuItem icon={<LuSearch size={iconSize} color="#ababab" />} label="Search" onShowFeatureModal={() => onShowFeatureModal(4)} />
       </div>
     );

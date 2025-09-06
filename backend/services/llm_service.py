@@ -8,7 +8,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from prompt_templates.recap_template import RECAP_TEMPLATE
 from prompt_templates.lookup_template import LOOKUP_TYPE_PROMPT_TEMPLATE, LOOKUP_CHARACTER_PROMPT_TEMPLATE, JSON_TO_PARAGRAPH_CHARACTER_TEMPLATE, LOOKUP_PLACE_PROMPT_TEMPLATE, JSON_TO_PARAGRAPH_LOCATION_TEMPLATE, LOOKUP_EVENT_PROMPT_TEMPLATE, JSON_TO_PARAGRAPH_EVENT_TEMPLATE, LOOKUP_OBJECT_PROMPT_TEMPLATE, JSON_TO_PARAGRAPH_OBJECT_TEMPLATE, LOOKUP_GROUP_PROMPT_TEMPLATE, JSON_TO_PARAGRAPH_GROUP_TEMPLATE
 from prompt_templates.ask_bro_template import ASK_BRO_PROMPT_TEMPLATE
-from prompt_templates.roleplay_template import CREATE_ROLEPLAY_SCENES_TEMPLATE
+from prompt_templates.roleplay_template import CREATE_ROLEPLAY_SCENES_TEMPLATE, ROLEPLAY_CHARACTER_BRIEF_TEMPLATE, ROLEPLAY_TEMPLATE
 
 class LLMService:
     def __init__(self):
@@ -167,5 +167,49 @@ class LLMService:
             return json_response 
 
         except Exception as e:
-            print(f"Error in ask bro: {e}")
+            print(f"Error in creating roleplay scenes: {e}")
+            raise e
+        
+    def create_character_brief(self, character_name, scene_description, read_text, recent_chapter_context):
+        try:
+            db = self._store_chunks(read_text)
+            results = db.similarity_search_with_score(character_name, k=5)
+            results = sorted(results, key=lambda x: x[0].metadata["chunk_id"])
+            context_list = [doc.page_content for doc, _score in results]
+            foundational_context = "\n\n---\n\n".join(context_list)
+            prompt_template = ChatPromptTemplate.from_template(ROLEPLAY_CHARACTER_BRIEF_TEMPLATE)
+            prompt = prompt_template.format(character_name=character_name, scene_description=scene_description, foundational_context=foundational_context, recent_chapter_context=recent_chapter_context)
+            response = self.model.generate_content(
+                prompt,
+                generation_config=genai.types.GenerationConfig(
+                    temperature=0.5,
+                    response_mime_type="application/json"
+                )
+            )
+            print('this is the character brief ' + response.text)
+            json_response = json.loads(response.text)
+            return json_response
+        
+        except Exception as e:
+            print(f"Error in creating character brief: {e}")
+            raise e
+        
+    def do_roleplay(self, character_name, character_brief, scene_description, recent_chapter_context, character_quotes, messages):
+        character_quotes_str = "\n".join([f'{q}' for q in character_quotes])
+        messages_str = "\n".join([f"{m['role']}: {m['content']}" for m in messages])
+        
+        try:
+            prompt_template = ChatPromptTemplate.from_template(ROLEPLAY_TEMPLATE)
+            prompt = prompt_template.format(character_name=character_name, character_brief=character_brief, scene_description=scene_description, recent_chapter_context=recent_chapter_context, character_quotes=character_quotes_str, messages=messages_str)
+            response = self.model.generate_content(
+                prompt,
+                generation_config=genai.types.GenerationConfig(
+                    temperature=0.5,
+                )
+            )
+            print('this is the character message ' + response.text)
+            return response.text
+        
+        except Exception as e:
+            print(f"Error in doing roleplay: {e}")
             raise e

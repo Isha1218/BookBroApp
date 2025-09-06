@@ -1,17 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
 import { LuSend, LuArrowLeft } from "react-icons/lu";
-import createRoleplayScenes from "../../../api/llm/RoleplayApi";
+import { createRoleplayScenes, createCharacterBrief, doRoleplay } from "../../../api/llm/RoleplayApi";
 import extractCurrChapter from "../../../services/ExtractCurrChapter";
 import extractPrevChapter from "../../../services/ExtractPrevChapter";
 import { IoColorWandSharp } from "react-icons/io5";
+import extractPrevChapters from "../../../services/ExtractPrevChapters";
 
-const CharacterCard = ({ character, backgroundColor, onSelect }) => {
+const CharacterCard = ({ character, onSelect }) => {
+    const characterName = character?.character || character?.name || 'Unknown';
+    const sceneName = character?.scene || 'No scene';
 
     return (
         <div 
             style={{
                 padding: '20px',
-                // backgroundColor: '#f8f8f8',
                 borderRadius: '12px',
                 margin: '10px 0',
                 cursor: 'pointer',
@@ -28,7 +30,8 @@ const CharacterCard = ({ character, backgroundColor, onSelect }) => {
                     width: '50px',
                     height: '50px',
                     borderRadius: '50%',
-                    backgroundColor: backgroundColor,
+                    border: '1px solid #e0e0e0',
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -36,7 +39,7 @@ const CharacterCard = ({ character, backgroundColor, onSelect }) => {
                     color: 'white',
                     fontWeight: 'bold'
                 }}>
-                    {character['character'].charAt(0)}
+                    {characterName.charAt(0).toUpperCase()}
                 </div>
                 <div style={{ flex: 1 }}>
                     <h3 style={{
@@ -45,7 +48,7 @@ const CharacterCard = ({ character, backgroundColor, onSelect }) => {
                         fontWeight: '600',
                         color: '#333'
                     }}>
-                        {character['character']}
+                        {characterName}
                     </h3>
                     <p style={{
                         margin: 0,
@@ -54,7 +57,7 @@ const CharacterCard = ({ character, backgroundColor, onSelect }) => {
                         lineHeight: '1.4',
                         fontStyle: "italic"
                     }}>
-                        Scene: {character['scene']}
+                        Scene: {sceneName}
                     </p>
                 </div>
             </div>
@@ -62,7 +65,10 @@ const CharacterCard = ({ character, backgroundColor, onSelect }) => {
     );
 };
 
-const SceneHeader = ({ scene, character }) => {
+const SceneHeader = ({ scene}) => {
+    const characterName = scene?.character || scene?.name || 'Unknown';
+    const sceneName = scene?.scene || 'No scene';
+
     return (
         <div style={{
             backgroundColor: '#f0f4f8',
@@ -81,7 +87,7 @@ const SceneHeader = ({ scene, character }) => {
                     width: '30px',
                     height: '30px',
                     borderRadius: '50%',
-                    backgroundColor: character.color,
+                    backgroundColor: 'black',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -89,14 +95,14 @@ const SceneHeader = ({ scene, character }) => {
                     color: 'white',
                     fontWeight: 'bold'
                 }}>
-                    {character.name.charAt(0)}
+                    {characterName.charAt(0).toUpperCase()}
                 </div>
                 <span style={{
                     fontSize: '16px',
                     fontWeight: '600',
                     color: '#333'
                 }}>
-                    {character.name}
+                    {characterName}
                 </span>
             </div>
             <p style={{
@@ -106,26 +112,28 @@ const SceneHeader = ({ scene, character }) => {
                 fontStyle: 'italic',
                 lineHeight: '1.4'
             }}>
-                <strong>Scene:</strong> {scene}
+                <strong>Scene:</strong> {sceneName}
             </p>
         </div>
     );
 };
 
-const RoleplayMessage = ({ message, isUser, character }) => {
+const RoleplayMessage = ({ role, content, scene }) => {
+    const characterName = scene?.character || scene?.name || 'Unknown';
+
     return (
         <div style={{
             display: 'flex',
-            justifyContent: isUser ? 'flex-end' : 'flex-start',
+            justifyContent: role === 'user' ? 'flex-end' : 'flex-start',
             marginBottom: '15px',
             width: '100%'
         }}>
-            {!isUser && (
+            {role !== 'user' && (
                 <div style={{
                     width: '32px',
                     height: '32px',
                     borderRadius: '50%',
-                    backgroundColor: character.color,
+                    backgroundColor: 'black',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -136,29 +144,30 @@ const RoleplayMessage = ({ message, isUser, character }) => {
                     flexShrink: 0,
                     alignSelf: 'flex-end'
                 }}>
-                    {character.name.charAt(0)}
+                    {characterName.charAt(0).toUpperCase()}
                 </div>
             )}
             <div style={{
                 maxWidth: '75%',
                 padding: '12px 16px',
                 borderRadius: '10px',
-                backgroundColor: isUser ? 'black' : '#ececec',
-                color: isUser ? 'white' : 'black',
+                backgroundColor: role === 'user' ? 'black' : '#ececec',
+                color: role === 'user' ? 'white' : 'black',
                 fontSize: '14px',
                 lineHeight: '1.4',
                 overflowWrap: 'break-word',
                 wordWrap: 'break-word',
                 whiteSpace: 'pre-wrap'
             }}>
-                {message}
+                {content}
             </div>
         </div>
     );
 };
 
-const MessageInput = ({ onSendMessage, isLoading, character }) => {
+const MessageInput = ({ onSendMessage, isLoading, scene }) => {
     const [message, setMessage] = useState('');
+    const characterName = scene?.character || scene?.name || 'Character';
 
     const handleInputChange = (e) => {
         setMessage(e.target.value);
@@ -194,7 +203,7 @@ const MessageInput = ({ onSendMessage, isLoading, character }) => {
                 value={message}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
-                placeholder={isLoading ? `${character.name} is responding...` : `Message ${character.name}...`}
+                placeholder={isLoading ? `${characterName} is responding...` : `Message ${characterName}...`}
                 autoComplete="off"
                 autoCorrect="off"
                 autoCapitalize="off"
@@ -232,78 +241,78 @@ const MessageInput = ({ onSendMessage, isLoading, character }) => {
     );
 };
 
-const Roleplay = ({ currentBookProgress = 45, book, rendition }) => {
-
-    const [selectedCharacter, setSelectedCharacter] = useState(null);
+const Roleplay = ({ book, rendition }) => {
+    const [scenes, setScenes] = useState([]);
+    const [selectedScene, setSelectedScene] = useState(null);
+    const [characterBrief, setCharacterBrief] = useState('');
+    const [characterQuotes, setCharacterQuotes] = useState([]);
     const [messages, setMessages] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [currentScene, setCurrentScene] = useState('');
+    const [isLoadingScenes, setIsLoadingScenes] = useState(true); 
+
     const chatContainerRef = useRef(null);
     const createRoleplayScenesRef = useRef(null);
-    const [scenes, setScenes] = useState([]);
-    const [characterColors, setCharacterColors] = useState({});
-
-    const getCharacterColor = () => {
-        const randomHex = Math.floor(Math.random() * 16777215).toString(16);
-        const paddedHex = '#' + randomHex.padStart(6, '0'); 
-        return paddedHex
-    };
 
     useEffect(() => {
         if (createRoleplayScenesRef.current) return;
         createRoleplayScenesRef.current = true;
         
         const fetchRoleplayScenes = async () => {
-          const prevChapter = await extractPrevChapter(rendition, book);
-          const currChapter = await extractCurrChapter(rendition, book);
-          const roleplayContext = prevChapter + currChapter;
-          const scenes = await createRoleplayScenes(roleplayContext)
-          setScenes(scenes)
-
-          const colors = {}
-          scenes.forEach((character) => {
-            colors[character['character']] = getCharacterColor()
-          })
-          setCharacterColors(colors)
+            try {
+                setIsLoadingScenes(true);
+                const prevChapter = await extractPrevChapter(rendition, book);
+                const currChapter = await extractCurrChapter(rendition, book);
+                const roleplayContext = prevChapter + currChapter;
+                const scenes = await createRoleplayScenes(roleplayContext);
+                
+                const scenesArray = Array.isArray(scenes) ? scenes : [];
+                setScenes(scenesArray);
+            } catch (error) {
+                console.error('Error fetching roleplay scenes:', error);
+                setScenes([]);
+            } finally {
+                setIsLoadingScenes(false);
+            }
         };
-    
+
         fetchRoleplayScenes();
-      }, []);
+    }, []);
 
-    const getSceneForProgress = (character, progress) => {
-        if (progress < 30) return character.scenes.early;
-        if (progress < 70) return character.scenes.mid;
-        return character.scenes.late;
+    const handleSceneSelect = async (scene) => {
+        try {
+            setSelectedScene(scene);
+            
+            const characterName = scene?.character || scene?.name || 'Unknown';
+            const firstDialogue = scene?.first_dialogue || scene?.firstDialogue || `Hello! I'm ${characterName}.`;
+            
+            const openingMessage = {
+                role: characterName,
+                content: firstDialogue,
+            };
+            setMessages([openingMessage]);
+
+            const prevChapters = await extractPrevChapters(rendition, book);
+            const currChapter = await extractCurrChapter(rendition, book);
+            const readText = prevChapters + currChapter;
+
+            const prevChapter = await extractPrevChapter(rendition, book);
+            const recentChapterContext = prevChapter + currChapter;
+            
+            const sceneName = scene?.scene || 'current scene';
+            const characterBrief = await createCharacterBrief(characterName, sceneName, readText, recentChapterContext);
+            
+            setCharacterBrief(characterBrief?.character_brief || characterBrief?.characterBrief || '');
+            setCharacterQuotes(characterBrief?.quotes || []);
+        } catch (error) {
+            console.error('Error selecting scene:', error);
+        }
     };
 
-    const handleCharacterSelect = (character) => {
-        setSelectedCharacter(character);
-        const scene = getSceneForProgress(character, currentBookProgress);
-        setCurrentScene(scene);
-        
-        // Initialize conversation with character's opening message
-        const openingMessage = {
-            id: 1,
-            text: getOpeningMessage(character, scene),
-            isUser: false
-        };
-        setMessages([openingMessage]);
-    };
-
-    const getOpeningMessage = (character, scene) => {
-        const openingMessages = {
-            'nesta': "What do you want? I'm not in the mood for company right now.",
-            'cassian': "Hey there. Ready for some training, or are you here to chat?",
-            'azriel': "*Steps out from the shadows* You're looking for me?",
-            'rhysand': "Well, well. What brings you to seek an audience with me?"
-        };
-        return openingMessages[character.id] || "Hello there.";
-    };
-
-    const handleBackToCharacters = () => {
-        setSelectedCharacter(null);
+    const handleBackToScenes = () => {
+        setSelectedScene(null);
         setMessages([]);
-        setCurrentScene('');
+        setCharacterBrief('');
+        setCharacterQuotes([]);
     };
 
     useEffect(() => {
@@ -313,58 +322,69 @@ const Roleplay = ({ currentBookProgress = 45, book, rendition }) => {
     }, [messages]);
 
     const handleSendMessage = async (messageText) => {
-        const userMessage = {
-            id: Date.now(),
-            text: messageText,
-            isUser: true
-        };
-        
-        setMessages(prev => [...prev, userMessage]);
-        setIsLoading(true);
-
-        setTimeout(() => {
-            const responses = {
-                'nesta': [
-                    "Don't expect me to go easy on you just because you're being nice.",
-                    "I've been through worse than you can imagine. This is nothing.",
-                    "Fine. But only because I have nothing better to do.",
-                    "You're more persistent than most. I'll give you that."
-                ],
-                'cassian': [
-                    "Ha! I like your spirit. Reminds me of someone I know.",
-                    "Alright, let's see what you're made of then.",
-                    "You've got potential, I'll admit that much.",
-                    "Trust me, I know a thing or two about overcoming challenges."
-                ],
-                'azriel': [
-                    "*His shadows seem to whisper secrets only he can hear*",
-                    "There's more to this situation than meets the eye.",
-                    "I've been watching. You handle yourself better than expected.",
-                    "Some truths are better discovered than told."
-                ],
-                'rhysand': [
-                    "Interesting perspective. I hadn't considered that angle.",
-                    "You speak with wisdom beyond your years, I must say.",
-                    "Power is nothing without the will to use it responsibly.",
-                    "The Night Court values those who think before they act."
-                ]
+        try {
+            const userMessage = {
+                role: 'user',
+                content: messageText,
             };
+            
+            setMessages(prev => [...prev, userMessage]);
+            setIsLoading(true);
 
-            const characterResponses = responses[selectedCharacter.id] || ["That's interesting."];
-            const randomResponse = characterResponses[Math.floor(Math.random() * characterResponses.length)];
+            const currChapter = await extractCurrChapter(rendition, book);
+            const prevChapter = await extractPrevChapter(rendition, book);
+            const recentChapterContext = prevChapter + currChapter;
+            
+            const characterName = selectedScene?.character || selectedScene?.name || 'Unknown';
+            const sceneName = selectedScene?.scene || 'current scene';
+            
+            const roleplayMessage = await doRoleplay(
+                characterName, 
+                characterBrief, 
+                sceneName, 
+                recentChapterContext, 
+                characterQuotes, 
+                [...messages, userMessage]
+            );
 
             const botResponse = {
-                id: Date.now() + 1,
-                text: randomResponse,
-                isUser: false
+                role: characterName,
+                content: roleplayMessage,
             };
             
             setMessages(prev => [...prev, botResponse]);
+        } catch (error) {
+            console.error('Error sending message:', error);
+            // Optionally add error message to chat
+            const errorMessage = {
+                role: 'system',
+                content: 'Sorry, there was an error processing your message.',
+            };
+            setMessages(prev => [...prev, errorMessage]);
+        } finally {
             setIsLoading(false);
-        }, 1500);
+        }
     };
 
-    if (!selectedCharacter) {
+    // Loading state for scenes
+    if (isLoadingScenes) {
+        return (
+            <div style={{ 
+                width: "95%", 
+                height: "100%",
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}>
+                <div style={{ textAlign: 'center' }}>
+                    <p style={{ fontSize: '16px', color: '#666' }}>Loading roleplay scenes...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // Scene selection view
+    if (!selectedScene) {
         return (
             <div style={{ 
                 width: "95%", 
@@ -374,12 +394,12 @@ const Roleplay = ({ currentBookProgress = 45, book, rendition }) => {
             }}>
                 <p
                     style={{
-                    fontSize: "25px",
-                    fontWeight: "700",
-                    margin: 0,
-                    marginBottom: "15px",
-                    marginTop: "15px",
-                    wordSpacing: "3px",
+                        fontSize: "25px",
+                        fontWeight: "700",
+                        margin: 0,
+                        marginBottom: "15px",
+                        marginTop: "15px",
+                        wordSpacing: "3px",
                     }}
                 >
                     Roleplay
@@ -394,20 +414,27 @@ const Roleplay = ({ currentBookProgress = 45, book, rendition }) => {
                     Choose a character to talk with. The scene will be set based on your current reading progress.
                 </p>
                 
-                {scenes.map((character) => {
-                    const backgroundColor = characterColors[character['character']];
-                    return (
-                    <CharacterCard
-                        key={character['character']}
-                        character={character}
-                        backgroundColor={backgroundColor}
-                        onSelect={handleCharacterSelect}
-                    />
-                )})}
+                {scenes.length === 0 ? (
+                    <p style={{ fontSize: '14px', color: '#999', fontStyle: 'italic' }}>
+                        No scenes available. Try reading more of the book first.
+                    </p>
+                ) : (
+                    scenes.map((scene, index) => {
+                        const characterName = scene?.character || scene?.name || 'Unknown';
+                        return (
+                            <CharacterCard
+                                key={`${characterName}-${index}`}
+                                character={scene}
+                                onSelect={handleSceneSelect}
+                            />
+                        );
+                    })
+                )}
             </div>
         );
     }
 
+    // Chat view
     return (
         <div style={{ 
             width: "95%", 
@@ -423,7 +450,7 @@ const Roleplay = ({ currentBookProgress = 45, book, rendition }) => {
                 marginTop: '15px',
             }}>
                 <button
-                    onClick={handleBackToCharacters}
+                    onClick={handleBackToScenes}
                     style={{
                         background: 'none',
                         border: 'none',
@@ -438,19 +465,18 @@ const Roleplay = ({ currentBookProgress = 45, book, rendition }) => {
                 </button>
                 <p
                     style={{
-                    fontSize: "25px",
-                    fontWeight: "700",
-                    margin: 0,
-                    wordSpacing: "3px",
+                        fontSize: "25px",
+                        fontWeight: "700",
+                        margin: 0,
+                        wordSpacing: "3px",
                     }}
                 >
-                    {selectedCharacter.name}
+                    {selectedScene?.character || selectedScene?.name || 'Character'}
                 </p>
             </div>
             
-            <SceneHeader scene={currentScene} character={selectedCharacter} />
+            <SceneHeader scene={selectedScene}/>
             
-            {/* Chat Messages Container */}
             <div 
                 ref={chatContainerRef}
                 style={{
@@ -462,12 +488,12 @@ const Roleplay = ({ currentBookProgress = 45, book, rendition }) => {
                     minHeight: 0
                 }}
             >
-                {messages.map((message) => (
+                {messages.map((message, index) => (
                     <RoleplayMessage
-                        key={message.id}
-                        message={message.text}
-                        isUser={message.isUser}
-                        character={selectedCharacter}
+                        key={`message-${index}`}
+                        role={message.role}
+                        content={message.content}
+                        scene={selectedScene}
                     />
                 ))}
                 
@@ -482,7 +508,7 @@ const Roleplay = ({ currentBookProgress = 45, book, rendition }) => {
                             width: '32px',
                             height: '32px',
                             borderRadius: '50%',
-                            backgroundColor: selectedCharacter.color,
+                            backgroundColor: 'black',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -492,7 +518,7 @@ const Roleplay = ({ currentBookProgress = 45, book, rendition }) => {
                             marginRight: '10px',
                             flexShrink: 0
                         }}>
-                            {selectedCharacter.name.charAt(0)}
+                            {(selectedScene?.character || selectedScene?.name || 'C').charAt(0).toUpperCase()}
                         </div>
                         <div style={{
                             padding: '12px 16px',
@@ -502,13 +528,12 @@ const Roleplay = ({ currentBookProgress = 45, book, rendition }) => {
                             fontSize: '14px',
                             fontStyle: 'italic'
                         }}>
-                            {selectedCharacter.name} is typing...
+                            {selectedScene?.character || selectedScene?.name || 'Character'} is typing...
                         </div>
                     </div>
                 )}
             </div>
             
-            {/* Message Input - Fixed at bottom */}
             <div style={{
                 flexShrink: 0,
                 display: 'flex',
@@ -518,7 +543,7 @@ const Roleplay = ({ currentBookProgress = 45, book, rendition }) => {
                 <MessageInput 
                     onSendMessage={handleSendMessage} 
                     isLoading={isLoading} 
-                    character={selectedCharacter}
+                    scene={selectedScene}
                 />
             </div>
         </div>

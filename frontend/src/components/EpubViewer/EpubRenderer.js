@@ -109,8 +109,8 @@ const EpubRenderer = () => {
           if (selection && selection.toString().length > 0) return;
         } catch (err) {}
 
-        if (deltaX > 0 && featureModalIndex == -1) renditionRef.current?.prev();
-        else if (featureModalIndex == -1) renditionRef.current?.next();
+        if (deltaX > 0) renditionRef.current?.prev();
+        else renditionRef.current?.next();
         return;
       }
 

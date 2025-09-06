@@ -234,6 +234,12 @@ const MessageInput = ({ onSendMessage, isLoading, character }) => {
 
 const Roleplay = ({ currentBookProgress = 45, book, rendition }) => {
 
+    const [selectedCharacter, setSelectedCharacter] = useState(null);
+    const [messages, setMessages] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [currentScene, setCurrentScene] = useState('');
+    const chatContainerRef = useRef(null);
+    const createRoleplayScenesRef = useRef(null);
     const [scenes, setScenes] = useState([]);
     const [characterColors, setCharacterColors] = useState({});
 
@@ -244,8 +250,8 @@ const Roleplay = ({ currentBookProgress = 45, book, rendition }) => {
     };
 
     useEffect(() => {
-        // if (fetchRecapRef.current) return;
-        // fetchRecapRef.current = true;
+        if (createRoleplayScenesRef.current) return;
+        createRoleplayScenesRef.current = true;
         
         const fetchRoleplayScenes = async () => {
           const prevChapter = await extractPrevChapter(rendition, book);
@@ -263,12 +269,6 @@ const Roleplay = ({ currentBookProgress = 45, book, rendition }) => {
     
         fetchRoleplayScenes();
       }, []);
-
-    const [selectedCharacter, setSelectedCharacter] = useState(null);
-    const [messages, setMessages] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [currentScene, setCurrentScene] = useState('');
-    const chatContainerRef = useRef(null);
 
     const getSceneForProgress = (character, progress) => {
         if (progress < 30) return character.scenes.early;

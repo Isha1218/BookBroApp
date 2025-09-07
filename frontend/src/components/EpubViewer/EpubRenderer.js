@@ -4,6 +4,7 @@ import BottomBar from "./Tabs/BottomBar";
 import TopBar from "./Tabs/TopBar";
 import SelectionMenu from "./Tabs/SelectionMenu";
 import ViewFeatureModal from "./Modals/ViewFeatureModal";
+import { addHighlight, getHighlights } from "../../api/database/HighlightsApi";
 
 const EpubRenderer = () => {
   const viewerRef = useRef(null);
@@ -17,6 +18,7 @@ const EpubRenderer = () => {
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
   const touchStartTime = useRef(0);
+  const highlightIds = useRef(new Set())
 
   const swipeThreshold = 30;
   const verticalTolerance = 60;
@@ -28,6 +30,7 @@ const EpubRenderer = () => {
   const [progress, setProgress] = useState(0);
   const [isTextSelected, setIsTextSelected] = useState(false);
   const [selectedText, setSelectedText] = useState("");
+  const [selectedCfiRange, setSelectedCfiRange] = useState("");
   const [showSelectionMenu, setShowSelectionMenu] = useState(false);
   const [featureModalIndex, setFeatureModalIndex] = useState(-1);
   const [toc, setToc] = useState([]);
@@ -125,6 +128,39 @@ const EpubRenderer = () => {
     [swipeThreshold, verticalTolerance, swipeTimeThreshold]
   );
 
+  const handleHighlight = useCallback(async () => {
+    console.log("handle highlight called");
+    if (!selectedCfiRange || !selectedText || !bookRef.current || !renditionRef.current) {
+      return;
+    }
+
+    console.log("cfi range", selectedCfiRange)
+    console.log("selected text", selectedText)
+
+    try {
+      const hId = await addHighlight(1, 1, selectedCfiRange, selectedText);
+      renditionRef.current.annotations.add(
+        "highlight",
+        selectedCfiRange, 
+        {
+          fill: "yellow",
+          fillOpacity: "0.4",
+          mixBlendMode: "multiply"
+        }, 
+        () => {
+          console.log("Highlight added")
+        },
+        hId
+      );
+      setIsTextSelected(false);
+      setSelectedText("");
+      setSelectedCfiRange("");
+      setFeatureModalIndex(-1);
+    } catch (error) {
+      console.error("Error adding highlight:", error);
+    }
+  }, [selectedCfiRange, selectedText])
+
   useEffect(() => {
     if (!showBar) return;
     const timer = setTimeout(() => setShowBar(false), 5000);
@@ -189,6 +225,7 @@ const EpubRenderer = () => {
 
     renditionRef.current.on("selected", async (cfiRange) => {
       setIsTextSelected(true);
+      setSelectedCfiRange(cfiRange);
       console.log("Text selected:", cfiRange);
 
       try {
@@ -200,13 +237,32 @@ const EpubRenderer = () => {
       }
     });
 
-    renditionRef.current.on("rendered", () => {
+    renditionRef.current.on("rendered", async () => {
       const iframe = viewerRef.current.querySelector("iframe");
       if (iframe) {
         iframe.contentDocument.addEventListener("mouseup", () => {
           const selection = iframe.contentWindow.getSelection();
           if (!selection || selection.toString().trim() === "") setIsTextSelected(false);
         });
+
+        const highlights = await getHighlights(1);
+        console.log('these are the highlights', highlights)
+        highlights.forEach(h => {
+          if (!highlightIds.current.has(h.id)) {
+            renditionRef.current.annotations.add(
+              "highlight",
+              h.cfiRange,
+              {
+                fill: "yellow",
+                fillOpacity: "0.4",
+                mixBlendMode: "multiply"
+              },
+              (e) => console.log('Highlight added'),
+              h.id
+            );
+            highlightIds.current.add(h.id)
+          }
+        })
       }
     });
 
@@ -257,7 +313,7 @@ const EpubRenderer = () => {
       onTouchEnd={handleTouchEnd}
     >
       {isTextSelected ? (
-        <SelectionMenu ref={menuRef} showBar={showSelectionMenu} onShowFeatureModal={handleShowFeatureModal} />
+        <SelectionMenu ref={menuRef} showBar={showSelectionMenu} onShowFeatureModal={handleShowFeatureModal} onHighlight={handleHighlight}/>
       ) : (
         <TopBar ref={topBarRef} showBar={showBar} onShowFeatureModal={handleShowFeatureModal} />
       )}

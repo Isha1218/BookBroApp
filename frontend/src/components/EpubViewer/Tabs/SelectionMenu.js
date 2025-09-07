@@ -48,7 +48,7 @@ const MenuItem = ({ icon, label, onShowFeatureModal }) => (
   );
   
 
-const SelectionMenu = forwardRef(({ showBar, onShowFeatureModal }, ref) => {
+const SelectionMenu = forwardRef(({ showBar, onShowFeatureModal, onHighlight }, ref) => {
     const [isOverflowing, setIsOverflowing] = useState(false);
   
     useEffect(() => {
@@ -83,7 +83,7 @@ const SelectionMenu = forwardRef(({ showBar, onShowFeatureModal }, ref) => {
           }
         `}</style>
   
-        <MenuItem icon={<BsHighlighter size={iconSize} color="#ababab"/>} label="Highlight" onShowFeatureModal={() => onShowFeatureModal(-1)} />
+        <MenuItem icon={<BsHighlighter size={iconSize} color="#ababab"/>} label="Highlight" onShowFeatureModal={() => onHighlight()} />
         <MenuItem icon={<LuTextSearch size={iconSize} color="#ababab"/>} label="Look Up" onShowFeatureModal={() => onShowFeatureModal(5)} />
       </div>
     );

@@ -16,9 +16,9 @@ class HighlightManager:
         result = [
             {
                 "id": h.id,
-                "book_id": h.book_id,
-                "user_id": h.user_id,
-                "cfi_range": h.cfi_range,
+                "bookId": h.book_id,
+                "userId": h.user_id,
+                "cfiRange": h.cfi_range,
                 "content": h.content
             }
             for h in highlights

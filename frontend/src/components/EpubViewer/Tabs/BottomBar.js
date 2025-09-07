@@ -1,8 +1,10 @@
 import React from "react";
 import { FiArrowLeft } from "react-icons/fi";
 import { LuSettings2 } from "react-icons/lu";
+import { useNavigate } from "react-router-dom";
 
 const BottomBar = ({ position, showBar }) => {
+    const navigate = useNavigate();
     return (
         <div
           style={{
@@ -16,7 +18,9 @@ const BottomBar = ({ position, showBar }) => {
             height: '40px'
           }}
         >
-          <button style={{
+          <button 
+          onClick={() => navigate("/homepage")}
+          style={{
             background: 'none',
             border: 'none',
             margin: 0,

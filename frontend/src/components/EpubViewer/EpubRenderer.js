@@ -19,6 +19,7 @@ const EpubRenderer = () => {
   const touchStartY = useRef(0);
   const touchStartTime = useRef(0);
   const highlightIds = useRef(new Set())
+  const isResizing = useRef(false);
 
   const swipeThreshold = 30;
   const verticalTolerance = 60;
@@ -68,7 +69,6 @@ const EpubRenderer = () => {
   const handleShowFeatureModal = useCallback((index) => {
     setFeatureModalIndex(index);
   }, []);
-
 
   const handleCloseFeatureModal = useCallback(() => {
     setFeatureModalIndex(-1);
@@ -205,25 +205,51 @@ const EpubRenderer = () => {
       tocRef.current = flatToc;
 
       bookRef.current.locations.generate(1600).then(() => {
-        const location = renditionRef.current.currentLocation();
-        const progress = bookRef.current.locations.percentageFromCfi(location.start.cfi);
-        setProgress(progress * 100);
+        try {
+          const location = renditionRef.current.currentLocation();
+          if (location && location.start && location.start.cfi) {
+            const progress = bookRef.current.locations.percentageFromCfi(location.start.cfi);
+            if (progress !== undefined && progress !== null && !isNaN(progress)) {
+              setProgress(progress * 100);
+            }
+          }
+        } catch (error) {
+          console.error('Error calculating initial progress:', error);
+        }
       });
     });
 
     const handleRelocated = (location) => {
-      const progress = bookRef.current.locations.percentageFromCfi(location.start.cfi);
-      setProgress(progress * 100);
+      if (isResizing.current) return;
+      
+      try {
+        if (!location || !location.start || !location.start.cfi) {
+          console.warn('Invalid location object in handleRelocated');
+          return;
+        }
 
-      const href = location.start.href.replace(/#.*/, "");
-      const index = tocRef.current.findIndex((item) =>
-        item.href.replace(/#.*/, "").endsWith(href)
-      );
+        if (bookRef.current && bookRef.current.locations) {
+          const progress = bookRef.current.locations.percentageFromCfi(location.start.cfi);
+          if (progress !== undefined && progress !== null && !isNaN(progress)) {
+            setProgress(progress * 100);
+          }
+        }
 
-      if (index !== -1) setCurrentIndex(index);
+        const href = location.start.href?.replace(/#.*/, "");
+        if (href && tocRef.current) {
+          const index = tocRef.current.findIndex((item) =>
+            item.href?.replace(/#.*/, "")?.endsWith(href)
+          );
+          if (index !== -1) setCurrentIndex(index);
+        }
+      } catch (error) {
+        console.error('Error in handleRelocated:', error);
+      }
     };
 
     renditionRef.current.on("selected", async (cfiRange) => {
+      if (isResizing.current) return;
+      
       setIsTextSelected(true);
       setSelectedCfiRange(cfiRange);
       console.log("Text selected:", cfiRange);
@@ -234,6 +260,9 @@ const EpubRenderer = () => {
         setSelectedText(selectedText);
       } catch (err) {
         console.error("Error extracting selected text:", err);
+        setIsTextSelected(false);
+        setSelectedText("");
+        setSelectedCfiRange("");
       }
     });
 
@@ -245,54 +274,89 @@ const EpubRenderer = () => {
           if (!selection || selection.toString().trim() === "") setIsTextSelected(false);
         });
 
-        const highlights = await getHighlights(1); // change to actual bookId
-        console.log('these are the highlights', highlights)
-        highlights.forEach(h => {
-          if (!highlightIds.current.has(h.id)) {
-            renditionRef.current.annotations.add(
-              "highlight",
-              h.cfiRange,
-              {
-                fill: "yellow",
-                fillOpacity: "0.4",
-                mixBlendMode: "multiply"
-              },
-              (e) => console.log('Highlight added'),
-              h.id
-            );
-            highlightIds.current.add(h.id)
-          }
-        })
+        try {
+          const highlights = await getHighlights(1); // change to actual bookId
+          console.log('these are the highlights', highlights)
+          highlights.forEach(h => {
+            if (!highlightIds.current.has(h.id)) {
+              try {
+                renditionRef.current.annotations.add(
+                  "highlight",
+                  h.cfiRange,
+                  {
+                    fill: "yellow",
+                    fillOpacity: "0.4",
+                    mixBlendMode: "multiply"
+                  },
+                  (e) => console.log('Highlight added'),
+                  h.id
+                );
+                highlightIds.current.add(h.id);
+              } catch (error) {
+                console.error('Error adding highlight:', h.id, error);
+              }
+            }
+          });
+        } catch (error) {
+          console.error('Error loading highlights:', error);
+        }
       }
     });
 
     renditionRef.current.on("relocated", handleRelocated);
-
     renditionRef.current.on("touchstart", handleTouchStart);
     renditionRef.current.on("touchend", handleTouchEnd);
 
     const applyFontSize = () => {
-      const fontSize = getResponsiveFontSize();
-      renditionRef.current?.themes.default({
-        body: {
-          "user-select": "text !important",
-          "-webkit-user-select": "text !important",
-          "-webkit-touch-callout": "default !important",
-          "font-size": `${fontSize}px !important`,
-        },
-        "::selection": { background: "rgba(255, 255, 0, 0.3)" },
-        "::-moz-selection": { background: "rgba(255, 255, 0, 0.3)" },
-      });
+      if (!renditionRef.current) return;
+      
+      isResizing.current = true;
+      
+      try {
+        const fontSize = getResponsiveFontSize();
+        renditionRef.current.themes.default({
+          body: {
+            "user-select": "text !important",
+            "-webkit-user-select": "text !important",
+            "-webkit-touch-callout": "default !important",
+            "font-size": `${fontSize}px !important`,
+          },
+          "::selection": { background: "rgba(255, 255, 0, 0.3)" },
+          "::-moz-selection": { background: "rgba(255, 255, 0, 0.3)" },
+        });
+      } catch (error) {
+        console.error('Error applying font size:', error);
+      }
+      
+      setTimeout(() => {
+        isResizing.current = false;
+      }, 300);
     };
 
     applyFontSize();
 
-    window.addEventListener("resize", applyFontSize);
+    let resizeTimeout;
+    const debouncedResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(applyFontSize, 100);
+    };
+
+    window.addEventListener("resize", debouncedResize);
+    window.addEventListener("orientationchange", () => {
+      setIsTextSelected(false);
+      setSelectedText("");
+      setSelectedCfiRange("");
+      setShowSelectionMenu(false);
+      
+      setTimeout(applyFontSize, 500);
+    });
 
     return () => {
+      clearTimeout(resizeTimeout);
       renditionRef.current?.destroy();
       bookRef.current?.destroy();
-      window.removeEventListener("resize", applyFontSize);
+      window.removeEventListener("resize", debouncedResize);
+      window.removeEventListener("orientationchange", applyFontSize);
     };
   }, [handleTouchStart, handleTouchEnd]);
 

@@ -1,13 +1,25 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from models.recap_model import Recap
 from models.lookup_model import LookUp
 from models.ask_bro_model import AskBro
 from models.roleplay_model import CreateRoleplayScenes, CreateCharacterBrief, Roleplay
+from models.highlight_model import AddHighlight, AllHighlights
 from services.llm_service import LLMService
+from database.db import SessionLocal
+from sqlalchemy.orm import Session
+from database.db_managers.highlight_manager import HighlightManager
 
 router = APIRouter(prefix="/api")
 
 llm_service = LLMService()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 @router.post('/get_recap')
 def get_recap(recap: Recap):
@@ -56,3 +68,13 @@ def do_roleplay(roleplay: Roleplay):
         return {"status": "success", "roleplay_message": resp}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@router.post('/add_highlight')
+def add_highlight(add_highlight: AddHighlight, db: Session = Depends(get_db)):
+    manager = HighlightManager(db)
+    return manager.add_highlight(add_highlight.cfi_range, add_highlight.content, add_highlight.user_id, add_highlight.book_id)
+
+@router.get("/highlights")
+def get_highlights(book_id, db: Session = Depends(get_db)):
+    manager = HighlightManager(db)
+    return manager.get_highlights(book_id)

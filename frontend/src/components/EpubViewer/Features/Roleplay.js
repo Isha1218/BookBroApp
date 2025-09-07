@@ -253,10 +253,10 @@ const Roleplay = ({ book, rendition }) => {
     const createRoleplayScenesRef = useRef(null);
 
     const bgColors = [
-        '#1BAFD0',
         '#FD636B',
         '#FFB900',
         '#B1D877',
+        '#1BAFD0',
     ]
 
     useEffect(() => {

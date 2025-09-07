@@ -3,7 +3,7 @@ from models.recap_model import Recap
 from models.lookup_model import LookUp
 from models.ask_bro_model import AskBro
 from models.roleplay_model import CreateRoleplayScenes, CreateCharacterBrief, Roleplay
-from models.highlight_model import AddHighlight, AllHighlights
+from models.highlight_model import AddHighlight
 from services.llm_service import LLMService
 from database.db import SessionLocal
 from sqlalchemy.orm import Session
@@ -40,7 +40,7 @@ def do_lookup(lookup: LookUp):
 @router.post('/do_ask_bro')
 def do_ask_bro(ask_bro: AskBro):
     try:
-        resp = llm_service.ask_bro(ask_bro.question, ask_bro.ask_bro_context)
+        resp = llm_service.ask_bro(ask_bro.question, ask_bro.recent_pages, ask_bro.ask_bro_context)
         return {"status": "success", "ask_bro_text": resp}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

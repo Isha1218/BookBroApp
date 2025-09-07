@@ -138,7 +138,7 @@ const EpubRenderer = () => {
     console.log("selected text", selectedText)
 
     try {
-      const hId = await addHighlight(1, 1, selectedCfiRange, selectedText);
+      const hId = await addHighlight(1, 1, selectedCfiRange, selectedText); // change to actual bookId and userId
       renditionRef.current.annotations.add(
         "highlight",
         selectedCfiRange, 
@@ -245,7 +245,7 @@ const EpubRenderer = () => {
           if (!selection || selection.toString().trim() === "") setIsTextSelected(false);
         });
 
-        const highlights = await getHighlights(1);
+        const highlights = await getHighlights(1); // change to actual bookId
         console.log('these are the highlights', highlights)
         highlights.forEach(h => {
           if (!highlightIds.current.has(h.id)) {

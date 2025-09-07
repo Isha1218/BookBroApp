@@ -203,10 +203,6 @@ const MessageInput = ({ onSendMessage, isLoading, scene }) => {
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
                 placeholder={isLoading ? `${characterName} is responding...` : `Message ${characterName}...`}
-                autoComplete="off"
-                autoCorrect="off"
-                autoCapitalize="off"
-                spellCheck="false"
                 style={{
                     margin: 0,
                     fontSize: '14px',
@@ -247,6 +243,7 @@ const Roleplay = ({ book, rendition }) => {
     const [characterQuotes, setCharacterQuotes] = useState([]);
     const [messages, setMessages] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isBriefLoading, setIsBriefLoading] = useState(false);
     const [isLoadingScenes, setIsLoadingScenes] = useState(true); 
 
     const chatContainerRef = useRef(null);
@@ -293,7 +290,7 @@ const Roleplay = ({ book, rendition }) => {
     const handleSceneSelect = async (scene) => {
         try {
             setSelectedScene(scene);
-            
+
             const characterName = scene?.character || scene?.name || 'Unknown';
             const firstDialogue = scene?.first_dialogue || scene?.firstDialogue || `Hello! I'm ${characterName}.`;
             
@@ -302,6 +299,8 @@ const Roleplay = ({ book, rendition }) => {
                 content: firstDialogue,
             };
             setMessages([openingMessage]);
+
+            setIsBriefLoading(true);
 
             const prevChapters = await extractPrevChapters(rendition, book);
             const currChapter = await extractCurrChapter(rendition, book);
@@ -317,6 +316,8 @@ const Roleplay = ({ book, rendition }) => {
             setCharacterQuotes(characterBrief?.quotes || []);
         } catch (error) {
             console.error('Error selecting scene:', error);
+        } finally {
+            setIsBriefLoading(false);
         }
     };
 
@@ -500,7 +501,7 @@ const Roleplay = ({ book, rendition }) => {
                     minHeight: 0
                 }}
             >
-                {messages.map((message, index) => (
+                {!isBriefLoading && messages.map((message, index) => (
                     <RoleplayMessage
                         key={`message-${index}`}
                         role={message.role}
@@ -509,7 +510,7 @@ const Roleplay = ({ book, rendition }) => {
                     />
                 ))}
                 
-                {isLoading && (
+                {(isLoading ||isBriefLoading) && (
                     <div style={{
                         display: 'flex',
                         justifyContent: 'flex-start',

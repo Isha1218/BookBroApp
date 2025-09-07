@@ -5,6 +5,3 @@ class AddHighlight(BaseModel):
     user_id: int = 0
     cfi_range: str = ''
     content: str = ''
-
-class AllHighlights(BaseModel):
-    book_id: int = 0

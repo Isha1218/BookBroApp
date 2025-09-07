@@ -7,6 +7,7 @@ import doLookUp from "../../../api/llm/LookUpApi";
 const LookUp = ({ selectedText, book, rendition }) => {
     const [lookUpType, setLookUpType] = useState("");
     const [lookUpText, setLookUpText] = useState("");
+    const [isLoading, setIsLoading] = useState(false);;
 
     const fetchLookUpRef = useRef(false);
 
@@ -15,6 +16,7 @@ const LookUp = ({ selectedText, book, rendition }) => {
         fetchLookUpRef.current = true;
         
         const fetchLookUp = async () => {
+            setIsLoading(true);
             const prevChapters = await extractPrevChapters(rendition, book);
             const currChapter = await extractCurrChapter(rendition, book);
             const currPage = await extractCurrPage(rendition);
@@ -22,10 +24,27 @@ const LookUp = ({ selectedText, book, rendition }) => {
             const { lookUpText, lookUpType } = await doLookUp(selectedText, lookUpContext);
             setLookUpText(lookUpText);
             setLookUpType(lookUpType);
+            setIsLoading(false);
         };
 
         fetchLookUp();
     }, []);
+
+    if (isLoading) {
+        return (
+            <div style={{ 
+                width: "95%", 
+                height: "100%",
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}>
+                <div style={{ textAlign: 'center' }}>
+                    <p style={{ fontSize: '16px', color: '#666' }}>Loading lookup for {selectedText}...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div style={{ width: "95%", overflowY: "auto", maxHeight: "100%" }}>

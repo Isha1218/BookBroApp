@@ -4,6 +4,7 @@ import doAskBro from "../../../api/llm/AskBroApi";
 import extractCurrChapter from "../../../services/ExtractCurrChapter";
 import extractPrevChapters from "../../../services/ExtractPrevChapters";
 import extractCurrPage from "../../../services/ExtractCurrPage";
+import extractPrevChapter from "../../../services/ExtractPrevChapter";
 
 const ChatMessage = ({ message, isUser }) => {
     return (
@@ -67,10 +68,6 @@ const MessageInput = ({ onSendMessage, isLoading }) => {
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
                 placeholder={isLoading ? "Bro is thinking..." : "Message Bro..."}
-                autoComplete="off"
-                autoCorrect="off"
-                autoCapitalize="off"
-                spellCheck="false"
                 style={{
                     margin: 0,
                     fontSize: '14px',
@@ -131,8 +128,10 @@ const Chat = ({ book, rendition }) => {
             const prevChapters = await extractPrevChapters(rendition, book);
             const currChapter = await extractCurrChapter(rendition, book);
             const currPage = await extractCurrPage(rendition);
+            const prevChapter = await extractPrevChapter(rendition, book);
             const askBroContext = prevChapters + currChapter + currPage;
-            const response = await doAskBro(messageText, askBroContext);
+            const recentPages = prevChapter + currChapter + currPage;
+            const response = await doAskBro(messageText, recentPages, askBroContext);
 
             const botResponse = {
                 id: Date.now() + 1,

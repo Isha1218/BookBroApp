@@ -2,7 +2,7 @@ import { IPADDRESS } from "../../consts/consts";
 
 const API_BASE_URL = 'http://' + IPADDRESS + ':5000';
 
-const doAskBro = async (question, askBroContext) => {
+const doAskBro = async (question, recentPages, askBroContext) => {
     try {
         const response = await fetch(`${API_BASE_URL}/api/do_ask_bro`, {
             method: 'POST',
@@ -11,6 +11,7 @@ const doAskBro = async (question, askBroContext) => {
             },
             body: JSON.stringify({
                 question: question,
+                recent_pages: recentPages,
                 ask_bro_context: askBroContext
             })
         });

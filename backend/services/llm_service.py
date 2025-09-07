@@ -93,7 +93,7 @@ class LLMService:
                 if start_idx == -1:
                     return "Unable to perform lookup"
                 else:
-                    window_size = 1000
+                    window_size = 10000
                     start_char = max(start_idx - window_size, 0)
                     end_char = min(start_idx + len(selected_text) + window_size, len(lookup_context))
                     context = lookup_context[start_char:end_char]
@@ -127,7 +127,7 @@ class LLMService:
             print(f"Error in lookup: {e}")
             raise e
     
-    def ask_bro(self, question, ask_bro_context):
+    def ask_bro(self, question, recent_pages, ask_bro_context):
         try:
             db = self._store_chunks(ask_bro_context)
             results = db.similarity_search_with_score(question, k=5)
@@ -137,7 +137,7 @@ class LLMService:
             context = "\n\n---\n\n".join(context_list)
             print('this is the context ' + context)
             prompt_template = ChatPromptTemplate.from_template(ASK_BRO_PROMPT_TEMPLATE)
-            prompt = prompt_template.format(question=question, context=context)
+            prompt = prompt_template.format(question=question, recent_pages=recent_pages, context=context)
             response = self.model.generate_content(
                 prompt,
                 generation_config=genai.types.GenerationConfig(

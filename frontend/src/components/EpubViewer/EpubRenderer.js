@@ -5,8 +5,15 @@ import TopBar from "./Tabs/TopBar";
 import SelectionMenu from "./Tabs/SelectionMenu";
 import ViewFeatureModal from "./Modals/ViewFeatureModal";
 import { addHighlight, getHighlights } from "../../api/database/HighlightsApi";
+import { useSearchParams } from "react-router-dom";
 
 const EpubRenderer = () => {
+  const [searchParams] = useSearchParams();
+  const file = searchParams.get('file');
+  const title = searchParams.get('title');
+  const startCfi = searchParams.get('currCfi');
+  const bookId = parseInt(searchParams.get('bookId'), 10);
+
   const viewerRef = useRef(null);
   const bookRef = useRef(null);
   const renditionRef = useRef(null);
@@ -36,6 +43,7 @@ const EpubRenderer = () => {
   const [featureModalIndex, setFeatureModalIndex] = useState(-1);
   const [toc, setToc] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentCfi, setCurrentCfi] = useState("");
 
   const getResponsiveFontSize = () => {
     const width = window.innerWidth;
@@ -173,8 +181,9 @@ const EpubRenderer = () => {
   }, [isTextSelected]);
 
   useEffect(() => {
+    console.log('this is the book url ' + file)
     const url =
-      "https://isha1218-ebooks.s3.us-east-2.amazonaws.com/isha1218_a_court_of_silver_flames_a_court_of_thorns_and_roses_sarah_j_maas.epub";
+      "https://isha1218-ebooks.s3.us-east-2.amazonaws.com/" + file
 
     bookRef.current = ePub(url);
 
@@ -186,7 +195,13 @@ const EpubRenderer = () => {
       spread: "none",
     });
 
-    renditionRef.current.display();
+    console.log('this is currCfi', startCfi)
+
+    if (startCfi === '') {
+      renditionRef.current.display();
+    } else {
+      renditionRef.current.display(startCfi)
+    };
 
     bookRef.current.ready.then(() => {
       const navigation = bookRef.current.navigation;
@@ -227,6 +242,8 @@ const EpubRenderer = () => {
           console.warn('Invalid location object in handleRelocated');
           return;
         }
+
+        setCurrentCfi(location.start.cfi);
 
         if (bookRef.current && bookRef.current.locations) {
           const progress = bookRef.current.locations.percentageFromCfi(location.start.cfi);
@@ -400,11 +417,14 @@ const EpubRenderer = () => {
           rendition={renditionRef.current}
           featureModalIndex={featureModalIndex}
           selectedText={selectedText}
+          title={title}
         />
       )}
       <BottomBar
         position={Math.round(progress) + "%"}
         showBar={showBar}
+        currentCfi={currentCfi}
+        bookId={bookId}
       />
     </div>
   );

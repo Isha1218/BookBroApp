@@ -5,7 +5,7 @@ import extractCurrChapter from "../../../services/ExtractCurrChapter";
 import doRecap from "../../../api/llm/RecapApi";
 import extractPrevChapter from "../../../services/ExtractPrevChapter";
 
-const Recap = ({ rendition, book }) => {
+const Recap = ({ rendition, book, title }) => {
   const [displayedText, setDisplayedText] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [recapText, setRecapText] = useState("");
@@ -77,7 +77,7 @@ const Recap = ({ rendition, book }) => {
           wordSpacing: "3px",
         }}
       >
-        Previously on <span style={{ fontStyle: "italic" }}>"A Court of Mist and Fury"</span>...
+        Previously on <span style={{ fontStyle: "italic" }}>"{title}"</span>...
       </p>
       {formatContentText(displayedText)}
     </div>

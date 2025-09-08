@@ -390,7 +390,7 @@ const Roleplay = ({ book, rendition }) => {
                 justifyContent: 'center'
             }}>
                 <div style={{ textAlign: 'center' }}>
-                    <p style={{ fontSize: '16px', color: '#666' }}>Loading roleplay scenes...</p>
+                    <p style={{ fontSize: '16px', color: '#666' }}>Generating scenes...</p>
                 </div>
             </div>
         );
@@ -424,7 +424,7 @@ const Roleplay = ({ book, rendition }) => {
                     margin: '0 0 20px 0',
                     lineHeight: '1.4'
                 }}>
-                    Choose a character to talk with. The scene will be set based on your current reading progress.
+                    Jump into the story and talk to characters like they're right there with you.
                 </p>
                 
                 {scenes.length === 0 ? (

@@ -8,8 +8,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<EpubViewer />}/>
-        <Route path="/homepage" element={<Home />}/>
+        <Route path="/ebook_reader" element={<EpubViewer />}/>
+        <Route path="/" element={<Home />}/>
       </Routes>
     </Router>
   );

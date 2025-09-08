@@ -1,13 +1,16 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, UploadFile, Form, Depends
+from typing import Optional
 from models.recap_model import Recap
 from models.lookup_model import LookUp
 from models.ask_bro_model import AskBro
 from models.roleplay_model import CreateRoleplayScenes, CreateCharacterBrief, Roleplay
 from models.highlight_model import AddHighlight
+from models.book_model import UpdateStatus, UpdateCurrCFI
 from services.llm_service import LLMService
 from database.db import SessionLocal
 from sqlalchemy.orm import Session
 from database.db_managers.highlight_manager import HighlightManager
+from database.db_managers.book_manager import BookManager
 
 router = APIRouter(prefix="/api")
 
@@ -19,7 +22,6 @@ def get_db():
         yield db
     finally:
         db.close()
-
 
 @router.post('/get_recap')
 def get_recap(recap: Recap):
@@ -78,3 +80,32 @@ def add_highlight(add_highlight: AddHighlight, db: Session = Depends(get_db)):
 def get_highlights(book_id, db: Session = Depends(get_db)):
     manager = HighlightManager(db)
     return manager.get_highlights(book_id)
+
+@router.post('/add_book')
+async def add_book(title: str = Form(...), author: str = Form(...), user_id: int = Form(...), file_bytes: UploadFile = None, cover_bytes: Optional[UploadFile] = None, db: Session = Depends(get_db)):
+    file_data = await file_bytes.read()
+    cover_data = await cover_bytes.read() if cover_bytes else b""
+    manager = BookManager(db)
+    return manager.add_book(title, author, user_id, file_data, cover_data)
+
+@router.get('/books')
+def get_books(user_id, db: Session = Depends(get_db)):
+    manager = BookManager(db)
+    return manager.get_books(user_id)
+
+@router.get("/book_status")
+def get_status(book_id, db: Session = Depends(get_db)):
+    manager = BookManager(db)
+    return manager.get_status(book_id)
+
+@router.patch("/books/{book_id}/update_status")
+def update_status(book_id, update: UpdateStatus, db: Session = Depends(get_db)):
+    manager = BookManager(db)
+    updated_status = manager.update_status(book_id, update.status)
+    return {"status": "success", "updated_status": updated_status}
+
+@router.patch("/books/{book_id}/update_curr_cfi")
+def update_curr_cfi(book_id, update: UpdateCurrCFI, db: Session = Depends(get_db)):
+    manager = BookManager(db)
+    updated_curr_cfi = manager.update_curr_cfi(book_id, update.curr_cfi)
+    return {"status": "success", "updated_curr_cfi": updated_curr_cfi}

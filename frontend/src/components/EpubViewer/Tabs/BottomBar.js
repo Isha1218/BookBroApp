@@ -2,9 +2,19 @@ import React from "react";
 import { FiArrowLeft } from "react-icons/fi";
 import { LuSettings2 } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
+import { updateBookCurrCfi } from "../../../api/database/BooksApi";
 
-const BottomBar = ({ position, showBar }) => {
+const BottomBar = ({ position, showBar, currentCfi, bookId }) => {
     const navigate = useNavigate();
+
+    const handleBackNavigation = async () => {
+      console.log("this is current cfi ", currentCfi)
+      if (currentCfi !== "") {
+        await updateBookCurrCfi(bookId, currentCfi);
+      }
+      navigate("/");
+    }
+
     return (
         <div
           style={{
@@ -19,7 +29,7 @@ const BottomBar = ({ position, showBar }) => {
           }}
         >
           <button 
-          onClick={() => navigate("/homepage")}
+          onClick={handleBackNavigation}
           style={{
             background: 'none',
             border: 'none',

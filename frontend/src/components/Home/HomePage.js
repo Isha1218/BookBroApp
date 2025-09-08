@@ -1,20 +1,32 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import BookGrid from "./BookGrid";
+import SearchBar from "./SearchBar";
+import TopBar from "./TopBar";
+import { getBooks } from "../../api/database/BooksApi";
 
 const HomePage = () => {
-  const navigate = useNavigate();
+    const [books, setBooks] = useState([]);
+
+    const fetchBooks = async() => {
+        try {
+            const data = await getBooks(1);
+            setBooks(data);
+        } catch (e) {
+            console.error("Failed to getch books:", e);
+        }
+    }
+
+    useEffect(() => {
+        fetchBooks();
+    }, []);
 
   return (
-    <div>
-      <div className="bg-black h-[200px] flex flex-col justify-center items-center">
-        <p className="text-7xl text-center text-blue-400">hi</p>
-        <button
-          onClick={() => navigate("/")}
-          className="mt-6 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-        >
-          Go to Epub Viewer
-        </button>
-      </div>
+    <div style={{
+        padding: '32px'
+    }}>
+      <TopBar userId={1} onUploadSuccess={fetchBooks}/>
+      <SearchBar/>
+      <BookGrid books={books}/>
     </div>
   );
 };

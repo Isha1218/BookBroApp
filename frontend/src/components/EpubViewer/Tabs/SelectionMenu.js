@@ -84,7 +84,7 @@ const SelectionMenu = forwardRef(({ showBar, onShowFeatureModal, onHighlight }, 
         `}</style>
   
         <MenuItem icon={<BsHighlighter size={iconSize} color="#ababab"/>} label="Highlight" onShowFeatureModal={() => onHighlight()} />
-        <MenuItem icon={<LuTextSearch size={iconSize} color="#ababab"/>} label="Look Up" onShowFeatureModal={() => onShowFeatureModal(5)} />
+        <MenuItem icon={<LuTextSearch size={iconSize} color="#ababab"/>} label="What's That" onShowFeatureModal={() => onShowFeatureModal(5)} />
       </div>
     );
   });

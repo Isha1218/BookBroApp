@@ -40,7 +40,7 @@ const LookUp = ({ selectedText, book, rendition }) => {
                 justifyContent: 'center'
             }}>
                 <div style={{ textAlign: 'center' }}>
-                    <p style={{ fontSize: '16px', color: '#666' }}>Loading lookup for {selectedText}...</p>
+                    <p style={{ fontSize: '16px', color: '#666' }}>Looking up {selectedText}...</p>
                 </div>
             </div>
         );

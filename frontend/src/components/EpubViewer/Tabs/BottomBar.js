@@ -2,15 +2,21 @@ import React from "react";
 import { FiArrowLeft } from "react-icons/fi";
 import { LuSettings2 } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
-import { updateBookCurrCfi } from "../../../api/database/BooksApi";
+import { updateBookCurrCfi, updateBookStatus } from "../../../api/database/BooksApi";
 
 const BottomBar = ({ position, showBar, currentCfi, bookId }) => {
     const navigate = useNavigate();
 
     const handleBackNavigation = async () => {
-      console.log("this is current cfi ", currentCfi)
+      console.log("this is current progress", position);
+      console.log("this is current cfi ", currentCfi);
       if (currentCfi !== "") {
         await updateBookCurrCfi(bookId, currentCfi);
+      }
+      if (position >= 99) {
+        await updateBookStatus(bookId, "done");
+      } else {
+        await updateBookStatus(bookId, "in progress")
       }
       navigate("/");
     }
@@ -39,7 +45,7 @@ const BottomBar = ({ position, showBar, currentCfi, bookId }) => {
           <p style={{
             color: '#ababab',
             fontSize: 'clamp(0.8rem, 2.5vw, 1rem)',
-          }}>{position}</p>
+          }}>{Math.round(position) + "%"}</p>
           <LuSettings2 color='transparent' size={Math.max(16, Math.min(24, window.innerWidth * 0.02))}/>
         </div>
     )

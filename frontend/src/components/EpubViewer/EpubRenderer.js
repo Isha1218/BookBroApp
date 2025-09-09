@@ -44,6 +44,7 @@ const EpubRenderer = () => {
   const [toc, setToc] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentCfi, setCurrentCfi] = useState("");
+  const [isLoadingBook, setIsLoadingBook] = useState(true);
 
   const getResponsiveFontSize = () => {
     const width = window.innerWidth;
@@ -308,6 +309,9 @@ const EpubRenderer = () => {
     });
 
     renditionRef.current.on("rendered", async () => {
+      // Hide loading when book is fully rendered
+      setIsLoadingBook(false);
+      
       const iframe = viewerRef.current.querySelector("iframe");
       if (iframe) {
         iframe.contentDocument.addEventListener("mouseup", () => {
@@ -401,56 +405,113 @@ const EpubRenderer = () => {
     };
   }, [handleTouchStart, handleTouchEnd]);
 
-  return (
-    <div
-      style={{
-        width: "100%",
-        height: "100vh",
-        position: "relative",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "40px",
-        boxSizing: "border-box",
-      }}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-    >
-      {isTextSelected ? (
-        <SelectionMenu ref={menuRef} showBar={showSelectionMenu} onShowFeatureModal={handleShowFeatureModal} onHighlight={handleHighlight}/>
-      ) : (
-        <TopBar ref={topBarRef} showBar={showBar} onShowFeatureModal={handleShowFeatureModal} />
-      )}
+  const spinnerStyle = {
+    width: '50px',
+    height: '50px',
+    border: '5px solid #f3f3f3',
+    borderTop: '5px solid #333',
+    borderRadius: '50%',
+    animation: 'spin 1s linear infinite'
+  };
 
+  const keyframes = `
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  `;
+
+  return (
+    <>
+      <style>{keyframes}</style>
       <div
-        ref={viewerRef}
         style={{
           width: "100%",
-          height: "100%",
-          zIndex: 0,
+          height: "100vh",
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "40px",
+          boxSizing: "border-box",
         }}
-      />
-      {featureModalIndex != -1 && (
-        <ViewFeatureModal
-          onCloseFeatureModal={handleCloseFeatureModal}
-          toc={toc}
-          onNavigate={handleNavigate}
-          currIndex={currentIndex}
-          book={bookRef.current}
-          rendition={renditionRef.current}
-          featureModalIndex={featureModalIndex}
-          selectedText={selectedText}
-          title={title}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {isLoadingBook && (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#fff',
+            zIndex: 1000,
+            gap: '24px'
+          }}>
+            <div style={spinnerStyle}></div>
+            <div style={{
+              textAlign: 'center',
+              color: '#666'
+            }}>
+              <p style={{
+                fontSize: '18px',
+                fontWeight: '600',
+                margin: '0 0 8px 0'
+              }}>
+                Opening "{title || 'Book'}"
+              </p>
+              <p style={{
+                fontSize: '14px',
+                margin: 0,
+                opacity: 0.8
+              }}>
+                Please wait while we prepare your reading experience...
+              </p>
+            </div>
+          </div>
+        )}
+
+        {isTextSelected ? (
+          <SelectionMenu ref={menuRef} showBar={showSelectionMenu} onShowFeatureModal={handleShowFeatureModal} onHighlight={handleHighlight}/>
+        ) : (
+          <TopBar ref={topBarRef} showBar={showBar} onShowFeatureModal={handleShowFeatureModal} />
+        )}
+
+        <div
+          ref={viewerRef}
+          style={{
+            width: "100%",
+            height: "100%",
+            zIndex: 0,
+          }}
         />
-      )}
-      <BottomBar
-        position={Math.round(progress) + "%"}
-        showBar={showBar}
-        currentCfi={currentCfi}
-        bookId={bookId}
-      />
-    </div>
+        {featureModalIndex != -1 && (
+          <ViewFeatureModal
+            onCloseFeatureModal={handleCloseFeatureModal}
+            toc={toc}
+            onNavigate={handleNavigate}
+            currIndex={currentIndex}
+            book={bookRef.current}
+            rendition={renditionRef.current}
+            featureModalIndex={featureModalIndex}
+            selectedText={selectedText}
+            title={title}
+          />
+        )}
+        <BottomBar
+          position={progress}
+          showBar={showBar}
+          currentCfi={currentCfi}
+          bookId={bookId}
+        />
+      </div>
+    </>
   );
 };
 

@@ -8,7 +8,7 @@ const BookGrid = ({ books }) => {
   
   const gridStyle = {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 150px))', 
+    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 175px))', 
     gap: '20px',
     maxWidth: '1200px',
     margin: '0 auto',
@@ -16,7 +16,7 @@ const BookGrid = ({ books }) => {
 
   const bookButtonStyle = {
     aspectRatio: '0.7',
-    borderRadius: '12px',
+    borderRadius: '4px',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
@@ -52,7 +52,7 @@ const BookGrid = ({ books }) => {
 
   const containerStyle = {
     minHeight: '100vh',
-    paddingTop: '40px'
+    paddingTop: '30px'
   };
 
   const handleClick = async (book) => {

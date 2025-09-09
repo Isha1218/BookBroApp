@@ -1,35 +1,37 @@
 import React, {useState} from "react";
 import { LuSearch } from "react-icons/lu";
 
-const SearchBar = ({}) => {
+const SearchBar = ({ onSearch }) => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const handleInputChange = (e) => {
         const value = e.target.value;
         setSearchTerm(value);
+        onSearch(value.trim())
     };
 
     const handleKeyDown = (e) => {
         if (e.key === 'Enter' && searchTerm.trim().length >= 2) {
             e.target.blur();
-            // onSearch(searchTerm.trim());
+            onSearch(searchTerm.trim());
+        } else if (e.key === 'Enter' && searchTerm.trim().length === 0) {
+            onSearch('');
         }
     };
 
-    // const handleBlur = () => {
-    //     if (searchTerm.trim().length >= 2) {
-    //         onSearch(searchTerm.trim());
-    //     } else if (searchTerm.trim().length === 0) {
-    //         onSearch('');
-    //     }
-    // };
+    const handleBlur = () => {
+        if (searchTerm.trim().length >= 2) {
+            onSearch(searchTerm.trim());
+        } else if (searchTerm.trim().length === 0) {
+            onSearch('');
+        }
+    };
 
     return (
         <div style={{
             backgroundColor: '#ececec',
             borderRadius: '10px',
             padding: '10px 16px 10px 16px',
-            // width: '90%',
             display: 'flex',
             flexDirection: 'row',
             gap: '10px',
@@ -41,8 +43,8 @@ const SearchBar = ({}) => {
                 value={searchTerm}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
-                // onBlur={handleBlur}
-                placeholder="what are you looking for"
+                onBlur={handleBlur}
+                placeholder="Search books by title or author..."
                 style={{
                     margin: 0,
                     color: '#919191',
@@ -54,16 +56,7 @@ const SearchBar = ({}) => {
                     width: '100%',
                     color: searchTerm ? '#000' : '#919191'
                 }}
-                // disabled={isSearching}
             />
-            {/* {isSearching && (
-                <div style={{
-                    fontSize: '12px',
-                    color: '#666'
-                }}>
-                    Searching...
-                </div>
-            )} */}
         </div>
     );
 };

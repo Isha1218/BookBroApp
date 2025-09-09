@@ -35,7 +35,13 @@ class BookManager:
         return curr_cfi
     
     def get_books(self, user_id):
-        books = self.db.query(Book).filter_by(user_id=user_id).all()
+        books = (
+            self.db.query(Book)
+            .filter_by(user_id=user_id)
+            .order_by(Book.updated_at.desc()) 
+            .all()
+        )
+
         result = []
         for b in books:
             cover_base64 = base64.b64encode(b.cover_image).decode() if b.cover_image else None

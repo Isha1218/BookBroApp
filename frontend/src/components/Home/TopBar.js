@@ -67,7 +67,9 @@ const TopBar = ({ userId, onUploadSuccess }) => {
     `;
 
     return (
-        <>
+        <div style={{
+            margin: '0 40px'
+        }}>
             <style>{keyframes}</style>
             <div style={{
                 display: 'flex',
@@ -122,7 +124,7 @@ const TopBar = ({ userId, onUploadSuccess }) => {
                     </button>
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 

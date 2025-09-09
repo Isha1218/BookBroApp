@@ -8,10 +8,12 @@ const BookGrid = ({ books }) => {
   
   const gridStyle = {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 175px))', 
+    gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 200px))',
     gap: '20px',
     maxWidth: '1200px',
     margin: '0 auto',
+    padding: '0 40px',
+    justifyContent: 'space-evenly',
   };
 
   const bookButtonStyle = {
@@ -51,7 +53,6 @@ const BookGrid = ({ books }) => {
   };
 
   const containerStyle = {
-    minHeight: '100vh',
     paddingTop: '30px'
   };
 
@@ -71,13 +72,12 @@ const BookGrid = ({ books }) => {
             key={book.id}
             style={{
               ...bookButtonStyle,
-            //   backgroundColor: book.color
-                backgroundImage: book.cover_image
+              backgroundImage: book.cover_image
                 ? `url(data:image/jpeg;base64,${book.cover_image})`
                 : `url(/harry_potter_cover.jpg)`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat'
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
             }}
             onClick={() => handleClick(book)}
           >

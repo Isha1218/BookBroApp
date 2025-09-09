@@ -197,10 +197,37 @@ const EpubRenderer = () => {
 
     console.log('this is currCfi', startCfi)
 
-    if (startCfi === '') {
-      renditionRef.current.display();
-    } else {
-      renditionRef.current.display(startCfi)
+    const updateTocIndex = (location) => {
+      if (!location || !location.start || !tocRef.current) return;
+      
+      const href = location.start.href?.replace(/#.*/, "");
+      if (href) {
+        const index = tocRef.current.findIndex((item) =>
+          item.href?.replace(/#.*/, "")?.endsWith(href)
+        );
+        if (index !== -1) {
+          setCurrentIndex(index);
+        }
+      }
+    };
+
+    const initializeBook = async () => {
+      try {
+        if (startCfi === '') {
+          await renditionRef.current.display();
+        } else {
+          await renditionRef.current.display(startCfi);
+          await new Promise(resolve => setTimeout(resolve, 50));
+          // we have have to call display twice -> it's weird
+          await renditionRef.current.display(startCfi);
+          const location = renditionRef.current.currentLocation();
+          if (location) {
+            updateTocIndex(location);
+          }
+        }
+      } catch (error) {
+        console.error('Error during initial book display:', error);
+      }
     };
 
     bookRef.current.ready.then(() => {
@@ -219,6 +246,8 @@ const EpubRenderer = () => {
       flattenToc(navigation.toc);
       tocRef.current = flatToc;
 
+      initializeBook();
+
       bookRef.current.locations.generate(1600).then(() => {
         try {
           const location = renditionRef.current.currentLocation();
@@ -227,6 +256,7 @@ const EpubRenderer = () => {
             if (progress !== undefined && progress !== null && !isNaN(progress)) {
               setProgress(progress * 100);
             }
+            updateTocIndex(location);
           }
         } catch (error) {
           console.error('Error calculating initial progress:', error);
@@ -252,13 +282,7 @@ const EpubRenderer = () => {
           }
         }
 
-        const href = location.start.href?.replace(/#.*/, "");
-        if (href && tocRef.current) {
-          const index = tocRef.current.findIndex((item) =>
-            item.href?.replace(/#.*/, "")?.endsWith(href)
-          );
-          if (index !== -1) setCurrentIndex(index);
-        }
+        updateTocIndex(location);
       } catch (error) {
         console.error('Error in handleRelocated:', error);
       }

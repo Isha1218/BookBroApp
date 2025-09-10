@@ -31,7 +31,7 @@ const SearchBar = ({ onSearch }) => {
         <div style={{
             backgroundColor: '#ececec',
             borderRadius: '10px',
-            padding: '10px 16px 10px 16px',
+            padding: '8px 16px 8px 16px',
             margin: '0 40px',
             display: 'flex',
             flexDirection: 'row',

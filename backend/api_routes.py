@@ -3,7 +3,7 @@ from typing import Optional
 from models.recap_model import Recap
 from models.lookup_model import LookUp
 from models.ask_bro_model import AskBro
-from models.roleplay_model import CreateRoleplayScenes, CreateCharacterBrief, Roleplay
+from models.roleplay_model import CreateRoleplayScenes, CreateCharacterBrief, Roleplay, SecondPersonPOV
 from models.highlight_model import AddHighlight
 from models.book_model import UpdateStatus, UpdateCurrCFI
 from services.llm_service import LLMService
@@ -47,6 +47,14 @@ def do_ask_bro(ask_bro: AskBro):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+@router.post('/second_person_pov')
+def convert_to_second_person_pov(second_person_pov: SecondPersonPOV):
+    try:
+        resp = llm_service.convert_to_second_person_pov(second_person_pov.dialogue)
+        return {"status": "success", "dialogue": resp}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
 @router.post('/create_roleplay_scenes')
 def create_roleplay_scenes(roleplay: CreateRoleplayScenes):
     try:
@@ -66,7 +74,7 @@ def create_character_brief(character_brief: CreateCharacterBrief):
 @router.post('/do_roleplay')
 def do_roleplay(roleplay: Roleplay):
     try:
-        resp = llm_service.do_roleplay(roleplay.character_name, roleplay.character_brief, roleplay.scene_description, roleplay.recent_chapter_context, roleplay.character_quotes, roleplay.messages)
+        resp = llm_service.do_roleplay(roleplay.character_name, roleplay.user_character_name, roleplay.character_brief, roleplay.scene_description, roleplay.recent_chapter_context, roleplay.character_quotes, roleplay.messages)
         return {"status": "success", "roleplay_message": resp}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

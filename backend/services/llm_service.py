@@ -8,7 +8,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from prompt_templates.recap_template import RECAP_TEMPLATE
 from prompt_templates.lookup_template import LOOKUP_TYPE_PROMPT_TEMPLATE, LOOKUP_CHARACTER_PROMPT_TEMPLATE, JSON_TO_PARAGRAPH_CHARACTER_TEMPLATE, LOOKUP_PLACE_PROMPT_TEMPLATE, JSON_TO_PARAGRAPH_LOCATION_TEMPLATE, LOOKUP_EVENT_PROMPT_TEMPLATE, JSON_TO_PARAGRAPH_EVENT_TEMPLATE, LOOKUP_OBJECT_PROMPT_TEMPLATE, JSON_TO_PARAGRAPH_OBJECT_TEMPLATE, LOOKUP_GROUP_PROMPT_TEMPLATE, JSON_TO_PARAGRAPH_GROUP_TEMPLATE
 from prompt_templates.ask_bro_template import ASK_BRO_PROMPT_TEMPLATE
-from prompt_templates.roleplay_template import CREATE_ROLEPLAY_SCENES_TEMPLATE, ROLEPLAY_CHARACTER_BRIEF_TEMPLATE, ROLEPLAY_TEMPLATE
+from prompt_templates.roleplay_template import CREATE_ROLEPLAY_SCENES_TEMPLATE, ROLEPLAY_CHARACTER_BRIEF_TEMPLATE, ROLEPLAY_TEMPLATE, SECOND_PERSON_POV_TEMPLATE
 
 class LLMService:
     def __init__(self):
@@ -151,6 +151,23 @@ class LLMService:
             print(f"Error in ask bro: {e}")
             raise e
         
+    def convert_to_second_person_pov(self, dialogue):
+        try:
+            prompt_template = ChatPromptTemplate.from_template(SECOND_PERSON_POV_TEMPLATE)
+            prompt = prompt_template.format(dialogue=dialogue)
+            response = self.model.generate_content(
+                 prompt,
+                generation_config=genai.types.GenerationConfig(
+                    temperature=0.5,
+                )
+            )
+            print('this is 2nd pov', response.text)
+            return response.text
+        
+        except Exception as e:
+            print(f"Error converting dialogue to second person POV: {e}")
+            raise e
+        
     def create_roleplay_scenes(self, roleplay_context):
         try:
             prompt_template = ChatPromptTemplate.from_template(CREATE_ROLEPLAY_SCENES_TEMPLATE)
@@ -194,13 +211,13 @@ class LLMService:
             print(f"Error in creating character brief: {e}")
             raise e
         
-    def do_roleplay(self, character_name, character_brief, scene_description, recent_chapter_context, character_quotes, messages):
+    def do_roleplay(self, character_name, user_character_name, character_brief, scene_description, recent_chapter_context, character_quotes, messages):
         character_quotes_str = "\n".join([f'{q}' for q in character_quotes])
         messages_str = "\n".join([f"{m['role']}: {m['content']}" for m in messages])
         
         try:
             prompt_template = ChatPromptTemplate.from_template(ROLEPLAY_TEMPLATE)
-            prompt = prompt_template.format(character_name=character_name, character_brief=character_brief, scene_description=scene_description, recent_chapter_context=recent_chapter_context, character_quotes=character_quotes_str, messages=messages_str)
+            prompt = prompt_template.format(character_name=character_name, user_character_name=user_character_name, character_brief=character_brief, scene_description=scene_description, recent_chapter_context=recent_chapter_context, character_quotes=character_quotes_str, messages=messages_str)
             response = self.model.generate_content(
                 prompt,
                 generation_config=genai.types.GenerationConfig(

@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { LuSend, LuArrowLeft } from "react-icons/lu";
-import { createRoleplayScenes, createCharacterBrief, doRoleplay } from "../../../api/llm/RoleplayApi";
+import { createRoleplayScenes, createCharacterBrief, doRoleplay, convertToSecondPersonPOV } from "../../../api/llm/RoleplayApi";
 import extractCurrChapter from "../../../services/ExtractCurrChapter";
 import extractPrevChapter from "../../../services/ExtractPrevChapter";
 import extractPrevChapters from "../../../services/ExtractPrevChapters";
 
 const CharacterCard = ({ character, onSelect }) => {
-    const characterName = character?.character || character?.name || 'Unknown';
+    const characterName = character?.llm_character || 'Unknown';
     const sceneName = character?.scene || 'No scene';
 
     return (
@@ -65,7 +65,7 @@ const CharacterCard = ({ character, onSelect }) => {
 };
 
 const SceneHeader = ({ scene }) => {
-    const characterName = scene?.character || 'Unknown';
+    const characterName = scene?.llm_character || 'Unknown';
     const sceneName = scene?.scene || 'No scene';
 
     return (
@@ -118,7 +118,7 @@ const SceneHeader = ({ scene }) => {
 };
 
 const RoleplayMessage = ({ role, content, scene }) => {
-    const characterName = scene?.character || 'Unknown';
+    const characterName = scene?.llm_character || 'Unknown';
 
     return (
         <div style={{
@@ -166,7 +166,7 @@ const RoleplayMessage = ({ role, content, scene }) => {
 
 const MessageInput = ({ onSendMessage, isLoading, scene }) => {
     const [message, setMessage] = useState('');
-    const characterName = scene?.character || scene?.name || 'Character';
+    const characterName = scene?.llm_character || 'Unknown';
 
     const handleInputChange = (e) => {
         setMessage(e.target.value);
@@ -291,8 +291,9 @@ const Roleplay = ({ book, rendition }) => {
         try {
             setSelectedScene(scene);
 
-            const characterName = scene?.character || scene?.name || 'Unknown';
-            const firstDialogue = scene?.first_dialogue || scene?.firstDialogue || `Hello! I'm ${characterName}.`;
+            const characterName = scene?.llm_character || 'Unknown';
+            let firstDialogue = scene?.first_dialogue || `Hello! I'm ${characterName}.`;
+            firstDialogue = await convertToSecondPersonPOV(firstDialogue);
             
             const openingMessage = {
                 role: characterName,
@@ -348,17 +349,21 @@ const Roleplay = ({ book, rendition }) => {
             const prevChapter = await extractPrevChapter(rendition, book);
             const recentChapterContext = prevChapter + currChapter;
             
-            const characterName = selectedScene?.character || selectedScene?.name || 'Unknown';
+            const characterName = selectedScene?.llm_character || 'Unknown';
+            const userCharacterName = selectedScene?.user_character || 'Unknown'
             const sceneName = selectedScene?.scene || 'current scene';
             
-            const roleplayMessage = await doRoleplay(
+            let roleplayMessage = await doRoleplay(
                 characterName, 
+                userCharacterName,
                 characterBrief, 
                 sceneName, 
                 recentChapterContext, 
                 characterQuotes, 
                 [...messages, userMessage]
             );
+
+            roleplayMessage = await convertToSecondPersonPOV(roleplayMessage);
 
             const botResponse = {
                 role: characterName,
@@ -368,7 +373,6 @@ const Roleplay = ({ book, rendition }) => {
             setMessages(prev => [...prev, botResponse]);
         } catch (error) {
             console.error('Error sending message:', error);
-            // Optionally add error message to chat
             const errorMessage = {
                 role: 'system',
                 content: 'Sorry, there was an error processing your message.',
@@ -379,7 +383,6 @@ const Roleplay = ({ book, rendition }) => {
         }
     };
 
-    // Loading state for scenes
     if (isLoadingScenes) {
         return (
             <div style={{ 
@@ -396,7 +399,6 @@ const Roleplay = ({ book, rendition }) => {
         );
     }
 
-    // Scene selection view
     if (!selectedScene) {
         return (
             <div style={{ 
@@ -433,7 +435,7 @@ const Roleplay = ({ book, rendition }) => {
                     </p>
                 ) : (
                     scenes.map((scene, index) => {
-                        const characterName = scene?.character || scene?.name || 'Unknown';
+                        const characterName = scene?.llm_character || 'Unknown';
                         return (
                             <CharacterCard
                                 key={`${characterName}-${index}`}
@@ -484,7 +486,7 @@ const Roleplay = ({ book, rendition }) => {
                         wordSpacing: "3px",
                     }}
                 >
-                    {selectedScene?.character || selectedScene?.name || 'Character'}
+                    {selectedScene?.llm_character || 'Unknown'}
                 </p>
             </div>
             
@@ -531,7 +533,7 @@ const Roleplay = ({ book, rendition }) => {
                             marginRight: '10px',
                             flexShrink: 0
                         }}>
-                            {(selectedScene?.character || selectedScene?.name || 'C').charAt(0).toUpperCase()}
+                            {(selectedScene?.llm_character || 'C').charAt(0).toUpperCase()}
                         </div>
                         <div style={{
                             padding: '12px 16px',
@@ -541,7 +543,7 @@ const Roleplay = ({ book, rendition }) => {
                             fontSize: '14px',
                             fontStyle: 'italic'
                         }}>
-                            {selectedScene?.character || selectedScene?.name || 'Character'} is typing...
+                            {selectedScene?.llm_character || 'Unknown'} is typing...
                         </div>
                     </div>
                 )}

@@ -68,7 +68,7 @@ const TopBar = ({ userId, onUploadSuccess }) => {
 
     return (
         <div style={{
-            margin: '0 40px'
+            margin: '20px 40px'
         }}>
             <style>{keyframes}</style>
             <div style={{
@@ -78,9 +78,10 @@ const TopBar = ({ userId, onUploadSuccess }) => {
                 alignItems: 'center'
             }}>
                 <p style={{
-                    fontWeight: 'bold',
+                    fontWeight: '600',
                     fontSize: '24px',
-                    wordSpacing: '4px'
+                    wordSpacing: '4px',
+                    margin: 0,
                 }}>My Books</p>
 
                 <input

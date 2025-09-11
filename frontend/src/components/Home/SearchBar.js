@@ -50,7 +50,6 @@ const SearchBar = ({ onSearch }) => {
                     margin: 0,
                     color: '#919191',
                     fontSize: '14px',
-                    wordSpacing: '2px',
                     background: 'none',
                     border: 'none',
                     outline: 'none',

@@ -6,6 +6,7 @@ import SelectionMenu from "./Tabs/SelectionMenu";
 import ViewFeatureModal from "./Modals/ViewFeatureModal";
 import { addHighlight, getHighlights } from "../../api/database/HighlightsApi";
 import { useSearchParams } from "react-router-dom";
+import { AWS_S3_URI_BASE } from "../../consts/consts";
 
 const EpubRenderer = () => {
   const [searchParams] = useSearchParams();
@@ -184,7 +185,7 @@ const EpubRenderer = () => {
   useEffect(() => {
     console.log('this is the book url ' + file)
     const url =
-      "https://isha1218-ebooks.s3.us-east-2.amazonaws.com/" + file
+      AWS_S3_URI_BASE + file
 
     bookRef.current = ePub(url);
 

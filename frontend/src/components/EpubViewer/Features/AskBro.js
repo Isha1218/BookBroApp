@@ -71,7 +71,6 @@ const MessageInput = ({ onSendMessage, isLoading }) => {
                 style={{
                     margin: 0,
                     fontSize: '14px',
-                    wordSpacing: '2px',
                     background: 'none',
                     border: 'none',
                     outline: 'none',

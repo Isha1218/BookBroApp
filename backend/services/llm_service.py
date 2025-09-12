@@ -187,7 +187,7 @@ class LLMService:
             print(f"Error in creating roleplay scenes: {e}")
             raise e
         
-    def create_character_brief(self, character_name, scene_description, read_text, recent_chapter_context):
+    def create_character_brief(self, character_name, user_character_name, scene_description, read_text, recent_chapter_context):
         try:
             db = self._store_chunks(read_text)
             results = db.similarity_search_with_score(character_name, k=5)
@@ -195,7 +195,7 @@ class LLMService:
             context_list = [doc.page_content for doc, _score in results]
             foundational_context = "\n\n---\n\n".join(context_list)
             prompt_template = ChatPromptTemplate.from_template(ROLEPLAY_CHARACTER_BRIEF_TEMPLATE)
-            prompt = prompt_template.format(character_name=character_name, scene_description=scene_description, foundational_context=foundational_context, recent_chapter_context=recent_chapter_context)
+            prompt = prompt_template.format(character_name=character_name, user_character=user_character_name, scene_description=scene_description, foundational_context=foundational_context, recent_chapter_context=recent_chapter_context)
             response = self.model.generate_content(
                 prompt,
                 generation_config=genai.types.GenerationConfig(
@@ -211,13 +211,12 @@ class LLMService:
             print(f"Error in creating character brief: {e}")
             raise e
         
-    def do_roleplay(self, character_name, user_character_name, character_brief, scene_description, recent_chapter_context, character_quotes, messages):
-        character_quotes_str = "\n".join([f'{q}' for q in character_quotes])
-        messages_str = "\n".join([f"{m['role']}: {m['content']}" for m in messages])
-        
+    def do_roleplay(self, character_name, user_character_name, relationship_dynamic, current_state, character_brief, behavioral_notes, scene_description, voice_samples, recent_chapter_context, messages):
+        voice_samples_str = "\n".join([f'{q}' for q in voice_samples])
+        messages_str = "\n".join([f"{m['role']}: {m['content']}" for m in messages])     
         try:
             prompt_template = ChatPromptTemplate.from_template(ROLEPLAY_TEMPLATE)
-            prompt = prompt_template.format(character_name=character_name, user_character_name=user_character_name, character_brief=character_brief, scene_description=scene_description, recent_chapter_context=recent_chapter_context, character_quotes=character_quotes_str, messages=messages_str)
+            prompt = prompt_template.format(character_name=character_name, user_character_name=user_character_name, relationship_dynamic=relationship_dynamic, current_state=current_state, character_brief=character_brief, behavioral_notes=behavioral_notes, scene_description=scene_description, voice_samples=voice_samples_str, recent_chapter_context=recent_chapter_context, messages=messages_str)
             response = self.model.generate_content(
                 prompt,
                 generation_config=genai.types.GenerationConfig(

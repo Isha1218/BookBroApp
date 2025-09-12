@@ -50,7 +50,7 @@ export const createRoleplayScenes = async (roleplayContext) => {
     }
 }
 
-export const createCharacterBrief = async (characterName, sceneDescription, readText, recentChapterContext) => {
+export const createCharacterBrief = async (characterName, userCharacterName, sceneDescription, readText, recentChapterContext) => {
     try {
         const response = await fetch(`${API_BASE_URL}/api/create_character_brief`, {
             method: 'POST',
@@ -59,6 +59,7 @@ export const createCharacterBrief = async (characterName, sceneDescription, read
             },
             body: JSON.stringify({
                 character_name: characterName,
+                user_character_name: userCharacterName,
                 scene_description: sceneDescription,
                 read_text: readText,
                 recent_chapter_context: recentChapterContext
@@ -77,7 +78,7 @@ export const createCharacterBrief = async (characterName, sceneDescription, read
     }
 }
 
-export const doRoleplay = async (characterName, userCharacterName, characterBrief, sceneDescription, recentChapterContext, characterQuotes, messages) => {
+export const doRoleplay = async (characterName, userCharacterName, relationshipDynamic, currentState, characterBrief, behavioralNotes, sceneDescription, voiceSamples, recentChapterContext, messages) => {
     try {
         const response = await fetch(`${API_BASE_URL}/api/do_roleplay`, {
             method: 'POST',
@@ -87,10 +88,13 @@ export const doRoleplay = async (characterName, userCharacterName, characterBrie
             body: JSON.stringify({
                 character_name: characterName,
                 user_character_name: userCharacterName,
+                relationship_dynamic: relationshipDynamic,
+                current_state: currentState,
                 character_brief: characterBrief,
+                behavioral_notes: behavioralNotes,
                 scene_description: sceneDescription,
+                voice_samples: voiceSamples,
                 recent_chapter_context: recentChapterContext,
-                character_quotes: characterQuotes,
                 messages: messages
             })
         });

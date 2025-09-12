@@ -238,8 +238,7 @@ const MessageInput = ({ onSendMessage, isLoading, scene }) => {
 const Roleplay = ({ book, rendition }) => {
     const [scenes, setScenes] = useState([]);
     const [selectedScene, setSelectedScene] = useState(null);
-    const [characterBrief, setCharacterBrief] = useState('');
-    const [characterQuotes, setCharacterQuotes] = useState([]);
+    const [characterBrief, setCharacterBrief] = useState({});
     const [messages, setMessages] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isBriefLoading, setIsBriefLoading] = useState(false);
@@ -291,6 +290,7 @@ const Roleplay = ({ book, rendition }) => {
             setSelectedScene(scene);
 
             const characterName = scene?.llm_character || 'Unknown';
+            const userCharacterName = scene?.user_character || 'Unknown';
             let firstDialogue = scene?.first_dialogue || `Hello! I'm ${characterName}.`;
             firstDialogue = await convertToSecondPersonPOV(firstDialogue);
             
@@ -310,10 +310,9 @@ const Roleplay = ({ book, rendition }) => {
             const recentChapterContext = prevChapter + currChapter;
             
             const sceneName = scene?.scene || 'current scene';
-            const characterBrief = await createCharacterBrief(characterName, sceneName, readText, recentChapterContext);
+            const characterBrief = await createCharacterBrief(characterName, userCharacterName, sceneName, readText, recentChapterContext);
             
-            setCharacterBrief(characterBrief?.character_brief || characterBrief?.characterBrief || '');
-            setCharacterQuotes(characterBrief?.quotes || []);
+            setCharacterBrief(characterBrief);
         } catch (error) {
             console.error('Error selecting scene:', error);
         } finally {
@@ -324,8 +323,7 @@ const Roleplay = ({ book, rendition }) => {
     const handleBackToScenes = () => {
         setSelectedScene(null);
         setMessages([]);
-        setCharacterBrief('');
-        setCharacterQuotes([]);
+        setCharacterBrief({});
     };
 
     useEffect(() => {
@@ -349,16 +347,25 @@ const Roleplay = ({ book, rendition }) => {
             const recentChapterContext = prevChapter + currChapter;
             
             const characterName = selectedScene?.llm_character || 'Unknown';
-            const userCharacterName = selectedScene?.user_character || 'Unknown'
-            const sceneName = selectedScene?.scene || 'current scene';
+            const userCharacterName = selectedScene?.user_character || 'Unknown';
+            const sceneDescription = selectedScene?.scene || 'current scene';
+
+            const characterBriefStr = characterBrief?.character_brief || 'Unknown';
+            const behavioralNotes = characterBrief?.behavioral_notes || 'Unknown';
+            const relationshipDynamic = characterBrief?.relationship_dynamic || 'Unknown';
+            const currentState = characterBrief?.current_state || 'Unknown';
+            const voiceSamples = characterBrief?.voice_samples || [];
             
             let roleplayMessage = await doRoleplay(
                 characterName, 
                 userCharacterName,
-                characterBrief, 
-                sceneName, 
+                relationshipDynamic,
+                currentState,
+                characterBriefStr, 
+                behavioralNotes,
+                sceneDescription, 
+                voiceSamples,
                 recentChapterContext, 
-                characterQuotes, 
                 [...messages, userMessage]
             );
 

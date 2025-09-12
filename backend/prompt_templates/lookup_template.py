@@ -241,10 +241,11 @@ Write a concise paragraph that describes the character's role in the story, pers
 
 Guidelines:
 - Include the character's role, personality, relationships (use the actual names given), and most important events.
+- Only include information from fields that are present and non-empty. Ignore missing or empty fields completely.
 - Use simple, easy-to-understand language. Avoid complex or technical words.
 - Do NOT reference the book context explicitly. Focus only on the character as described in the JSON.
 - Only include major information. Ignore minor interactions or trivial details.
-- The paragraph should be 4-6 sentences and flow naturally like a short literary analysis.
+- The paragraph should be 1-6 sentences and flow naturally.
 
 Paragraph:
 """
@@ -259,10 +260,11 @@ Write a concise paragraph that describes the location's type, physical character
 
 Guidelines:
 - Include the location's type, description, significance, and notable events. Use the actual names given.
+- Only include information from fields that are present and non-empty. Ignore missing or empty fields completely.
 - Use simple, easy-to-understand language. Avoid complex or technical words.
 - Do NOT reference the book context explicitly. Focus only on the location as described in the JSON.
 - Only include major information. Ignore minor or insignificant details.
-- The paragraph should be 4-6 sentences and flow naturally like a short literary analysis.
+- The paragraph should be 1-6 sentences and flow naturally.
 
 Paragraph:
 """
@@ -277,10 +279,11 @@ Write a concise paragraph that describes the event's timing in the story, what h
 
 Guidelines:
 - Include the event's name, story-time, description, outcome, and main participants (use the names and roles given).
+- Only include information from fields that are present and non-empty. Ignore missing or empty fields completely.
 - Use simple, easy-to-understand language. Avoid complex or technical words.
 - Do NOT reference the book context explicitly. Focus only on the event as described in the JSON.
 - Only include major details. Ignore minor or trivial actions.
-- The paragraph should be 4-6 sentences and flow naturally like a short literary summary.
+- The paragraph should be 1-6 sentences and flow naturally.
 
 Paragraph:
 """
@@ -295,10 +298,11 @@ Write a concise paragraph that describes the object's appearance, abilities or p
 
 Guidelines:
 - Include the object's name, description, abilities or properties, main owners/users (use the names and roles given), and significance.
+- Only include information from fields that are present and non-empty. Ignore missing or empty fields completely.
 - Use simple, easy-to-understand language. Avoid complex or technical words.
 - Do NOT reference the book context explicitly. Focus only on the object as described in the JSON.
 - Only include major details. Ignore minor or trivial mentions.
-- The paragraph should be 4-6 sentences and flow naturally like a short literary summary.
+- The paragraph should be 1-6 sentences and flow naturally.
 
 Paragraph:
 """
@@ -313,10 +317,11 @@ Write a concise paragraph that describes the group's purpose, type, key members 
 
 Guidelines:
 - Include the group's name, type, purpose, main members (use the names and roles given), and notable events.
+- Only include information from fields that are present and non-empty. Ignore missing or empty fields completely.
 - Use simple, easy-to-understand language. Avoid complex or technical words.
 - Do NOT reference the book context explicitly. Focus only on the group as described in the JSON.
 - Only include major details. Ignore minor or trivial actions.
-- The paragraph should be 4-6 sentences and flow naturally like a short literary summary.
+- The paragraph should be 4-6 sentences and flow naturally.
 
 Paragraph:
 """

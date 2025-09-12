@@ -66,7 +66,7 @@ def create_roleplay_scenes(roleplay: CreateRoleplayScenes):
 @router.post('/create_character_brief')
 def create_character_brief(character_brief: CreateCharacterBrief):
     try:
-        resp = llm_service.create_character_brief(character_brief.character_name, character_brief.scene_description, character_brief.read_text, character_brief.recent_chapter_context)
+        resp = llm_service.create_character_brief(character_brief.character_name, character_brief.user_character_name, character_brief.scene_description, character_brief.read_text, character_brief.recent_chapter_context)
         return {"status": "success", "character_brief": resp}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -74,7 +74,7 @@ def create_character_brief(character_brief: CreateCharacterBrief):
 @router.post('/do_roleplay')
 def do_roleplay(roleplay: Roleplay):
     try:
-        resp = llm_service.do_roleplay(roleplay.character_name, roleplay.user_character_name, roleplay.character_brief, roleplay.scene_description, roleplay.recent_chapter_context, roleplay.character_quotes, roleplay.messages)
+        resp = llm_service.do_roleplay(roleplay.character_name, roleplay.user_character_name, roleplay.relationship_dynamic, roleplay.current_state, roleplay.character_brief, roleplay.behavioral_notes, roleplay.scene_description, roleplay.voice_samples, roleplay.recent_chapter_context, roleplay.messages)
         return {"status": "success", "roleplay_message": resp}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

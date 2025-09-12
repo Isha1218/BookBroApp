@@ -82,6 +82,11 @@ const EpubRenderer = () => {
 
   const handleCloseFeatureModal = useCallback(() => {
     setFeatureModalIndex(-1);
+    setIsTextSelected(false);
+    setSelectedText("");
+    setSelectedCfiRange("");
+    setShowSelectionMenu(false);
+    setShowBar(false);
   }, []);
 
   const handleTouchStart = useCallback((e) => {

@@ -7,9 +7,9 @@ import Settings from "../Features/Settings";
 import TableOfContents from "../Features/TableOfContents";
 import React from "react";
 
-const ViewFeatureModal = ({ onCloseFeatureModal, toc, onNavigate, currIndex, book, rendition, featureModalIndex, selectedText = '', title}) => {
+const ViewFeatureModal = ({ onCloseFeatureModal, toc, onNavigate, currIndex, book, rendition, featureModalIndex, selectedText = '', title, pagesLeftInChapter }) => {
     const features = [
-        <TableOfContents toc={toc} onNavigate={onNavigate} currIndex={currIndex}/>,
+        <TableOfContents toc={toc} onNavigate={onNavigate} currIndex={currIndex} pagesLeftInChapter={pagesLeftInChapter}/>,
         <Chat book={book} rendition={rendition}/>,
         <Recap book={book} rendition={rendition} title={title}/>,
         <Roleplay book={book} rendition={rendition}/>,

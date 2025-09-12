@@ -46,6 +46,28 @@ const EpubRenderer = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentCfi, setCurrentCfi] = useState("");
   const [isLoadingBook, setIsLoadingBook] = useState(true);
+  const [pagesLeftInChapter, setPagesLeftInChapter] = useState(0);
+
+  const calculatePagesLeftInChapter = useCallback(() => {
+    if (!renditionRef.current || !bookRef.current) return 0;
+    
+    try {
+      const location = renditionRef.current.currentLocation();
+      if (!location || !location.start) return 0;
+      
+      const currentPage = location.start.displayed.page;
+      const totalPagesInChapter = location.start.displayed.total;
+      
+      const pagesLeft = totalPagesInChapter - currentPage;
+      console.log('this is the number of pages left in the chapter', pagesLeft)
+      setPagesLeftInChapter(pagesLeft);
+      
+      return pagesLeft;
+    } catch (error) {
+      console.error('Error calculating pages left:', error);
+      return 0;
+    }
+  }, []);
 
   const getResponsiveFontSize = () => {
     const width = window.innerWidth;
@@ -290,6 +312,7 @@ const EpubRenderer = () => {
         }
 
         updateTocIndex(location);
+        calculatePagesLeftInChapter();
       } catch (error) {
         console.error('Error in handleRelocated:', error);
       }
@@ -315,8 +338,9 @@ const EpubRenderer = () => {
     });
 
     renditionRef.current.on("rendered", async () => {
-      // Hide loading when book is fully rendered
       setIsLoadingBook(false);
+
+      calculatePagesLeftInChapter();
       
       const iframe = viewerRef.current.querySelector("iframe");
       if (iframe) {
@@ -508,6 +532,7 @@ const EpubRenderer = () => {
             featureModalIndex={featureModalIndex}
             selectedText={selectedText}
             title={title}
+            pagesLeftInChapter={pagesLeftInChapter}
           />
         )}
         <BottomBar

@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { IoIosCheckmark } from "react-icons/io";
 import { LuAsterisk } from "react-icons/lu";
 
-const TableOfContents = ({ toc, onNavigate, currIndex }) => {
+const TableOfContents = ({ toc, onNavigate, currIndex, pagesLeftInChapter }) => {
   const globalIndex = useRef(0);
 
   const renderTocItems = (items, level = 0) => {
@@ -14,13 +14,22 @@ const TableOfContents = ({ toc, onNavigate, currIndex }) => {
           globalIndex.current += 1;
 
           return (
-            <li key={item.id} style={{ padding: "10px 0", borderBottom: item.subitems && item.subitems.length > 0 ? "none" : "1px solid #eee" }}>
+            <li
+              key={item.id}
+              style={{
+                padding: "10px 0",
+                borderBottom:
+                  item.subitems && item.subitems.length > 0
+                    ? "none"
+                    : "1px solid #eee",
+              }}
+            >
               <button
                 onClick={() => onNavigate(item.href)}
                 style={{
                   background: "none",
                   border: "none",
-                  padding: '5px',
+                  padding: "5px",
                   margin: 0,
                   color: showCheck ? "#919191" : "black",
                   fontSize: "15px",
@@ -29,16 +38,44 @@ const TableOfContents = ({ toc, onNavigate, currIndex }) => {
                   display: "flex",
                   flexDirection: "row",
                   alignItems: "center",
+                  justifyContent: "space-between", // 👈 pushes label left, pages right
+                  fontWeight: showCheck ? "400" : "600",
                   gap: "10px",
-                  fontWeight: showCheck ? "400": "600",
                 }}
               >
-                {!showAsterisk ? (showCheck ? (<IoIosCheckmark size={24} color="#919191" />) : (<IoIosCheckmark size={24} color="transparent" />)) : (<LuAsterisk size={24} color="black"/>)}
-                {item.label}
+                {/* Left side: checkmark + label */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: "10px",
+                  }}
+                >
+                  {!showAsterisk ? (
+                    showCheck ? (
+                      <IoIosCheckmark size={24} color="#919191" />
+                    ) : (
+                      <IoIosCheckmark size={24} color="transparent" />
+                    )
+                  ) : (
+                    <LuAsterisk size={24} color="black" />
+                  )}
+                  <span>{item.label}</span>
+                </div>
+          
+                {showAsterisk && (
+                  <p style={{ margin: 0, color: "#919191", fontSize: "14px", fontWeight: 'normal' }}>
+                    {pagesLeftInChapter} pages left
+                  </p>
+                )}
               </button>
-              {item.subitems && item.subitems.length > 0 && renderTocItems(item.subitems, level + 1)}
+          
+              {item.subitems && item.subitems.length > 0 &&
+                renderTocItems(item.subitems, level + 1)}
             </li>
           );
+          
         })}
       </ul>
     );

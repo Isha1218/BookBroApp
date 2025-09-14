@@ -33,7 +33,17 @@ All features are contextually aware and will never spoil future events. The AI o
 
 *Screenshots showcase Fourth Wing (spoiler warning!)*
 
-![App Interface](path-to-your-screenshots)
+<img src="https://github.com/user-attachments/assets/7f04d6fb-daff-446b-a17e-90440efbabeb" width="300" />
+
+<img src="https://github.com/user-attachments/assets/2efbfa1b-6538-4589-8805-c71fbe5d44a5" width="300" />
+
+<img src="https://github.com/user-attachments/assets/857c9d23-1027-4a61-9ab5-daaed6ed31d0" width="300" />
+
+<img src="https://github.com/user-attachments/assets/e2027eb0-5980-4195-a6a1-ee33ba137295" width="300" />
+
+<img src="https://github.com/user-attachments/assets/23662386-f8cd-41a5-9cf2-24ffed6dd889" width="300" />
+
+<img src="https://github.com/user-attachments/assets/e8892739-5922-4863-8720-1cd6965da785" width="300" />
 
 ## Technology Stack 💻
 

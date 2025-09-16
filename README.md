@@ -82,20 +82,27 @@ The app is being built with a mobile-first approach using Capacitor, making it a
 - Node.js (v16 or higher)
 - Python 3.8+
 - npm or yarn
+- PostgreSQL database
+- Google Gemini API key
+- AWS S3 bucket (optional, for file storage)
 
-### Frontend Setup
+### 1. Clone Repository
 ```bash
 git clone https://github.com/Isha1218/BookBroApp.git
 cd BookBroApp
+```
 
+### 2. Frontend Setup
+```bash
 # Install dependencies
 npm install
 
-# Run development server
-npm start
+# Configure constants
+cp frontend/src/consts/consts.example.js frontend/src/consts/consts.js
+# Edit consts.js with your configuration
 ```
 
-### Backend Setup
+### 3. Backend Setup
 ```bash
 cd backend
 
@@ -106,11 +113,18 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 
+# Configure API keys and database
+cp consts/api_keys.example.py consts/api_keys.py
+cp consts/db_keys.example.py consts/db_keys.py
+cp consts/s3_keys.example.py consts/s3_keys.py
+
+# Edit each file with your credentials (see Configuration section below)
+
 # Start FastAPI server
 uvicorn main:app --reload
 ```
 
-### Mobile Development
+### 4. Mobile Development (Optional)
 ```bash
 # Build for mobile
 npm run build
@@ -126,6 +140,77 @@ npx cap sync
 npx cap open ios
 npx cap open android
 ```
+
+## Configuration 🔧
+
+### Frontend Configuration (`frontend/src/consts/consts.js`)
+```javascript
+export const IPADDRESS = 'your-backend-ip-address' // e.g., 'localhost' or '192.168.0.19'
+export const AWS_S3_URI_BASE = 'https://your-bucket-name.s3.your-region.amazonaws.com/'
+```
+
+### Backend API Keys (`backend/consts/api_keys.py`)
+```python
+# Get your Gemini API key from https://makersuite.google.com/app/apikey
+APIKEY = 'your-gemini-api-key-here'
+```
+
+### Database Configuration (`backend/consts/db_keys.py`)
+```python
+HOST = 'localhost'  # or your PostgreSQL host
+DBNAME = 'BookBro'  # your database name
+USERNAME = 'your-postgres-username'
+PASSWORD = 'your-postgres-password'
+```
+
+### S3 Configuration (`backend/consts/s3_keys.py`)
+```python
+BUCKETNAME = 'your-s3-bucket-name'
+```
+
+### Required Services Setup
+
+#### 1. PostgreSQL Database
+- Install PostgreSQL on your system
+- Create a database named `BookBro` (or update `DBNAME` in config)
+- Ensure your user has proper permissions
+
+#### 2. Google Gemini API
+- Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
+- Create a new API key
+- Add it to your `api_keys.py` file
+
+#### 3. AWS S3 (Optional)
+- Create an S3 bucket in AWS
+- Configure your AWS credentials (via AWS CLI or environment variables)
+- Update the bucket name in your configuration files
+
+## Environment Variables (Alternative Setup)
+
+Instead of editing configuration files directly, you can use environment variables:
+
+```bash
+# Frontend
+export REACT_APP_BACKEND_IP=localhost
+export REACT_APP_S3_BASE_URL=https://your-bucket.s3.region.amazonaws.com/
+
+# Backend
+export GEMINI_API_KEY=your-api-key
+export DB_HOST=localhost
+export DB_NAME=BookBro
+export DB_USER=postgres
+export DB_PASSWORD=your-password
+export S3_BUCKET=your-bucket-name
+```
+
+## Security Notes 🔒
+
+**Important**: Never commit sensitive credentials to version control!
+
+- All configuration files with actual credentials should be in `.gitignore`
+- Use example/template files for repository sharing
+- Consider using environment variables for production deployments
+- Rotate API keys regularly and use principle of least privilege for database users
 
 ## Roadmap 🗺️
 

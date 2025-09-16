@@ -1,4 +1,4 @@
-import { IPADDRESS } from "../../consts/consts_private";
+import { IPADDRESS } from "../../consts/consts";
 
 const API_BASE_URL = 'http://' + IPADDRESS + ':5000';
 

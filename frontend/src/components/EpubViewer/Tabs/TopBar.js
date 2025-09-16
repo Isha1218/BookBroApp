@@ -50,7 +50,7 @@ const MenuItem = ({ icon, label, onShowFeatureModal }) => (
   </button>
 );
 
-const TopBar = forwardRef(({ showBar, onShowFeatureModal }, ref) => {
+const TopBar = forwardRef(({ showBar, onShowFeatureModal, showInitialRecap }, ref) => {
     const [isOverflowing, setIsOverflowing] = useState(false);
   
     useEffect(() => {
@@ -63,7 +63,7 @@ const TopBar = forwardRef(({ showBar, onShowFeatureModal }, ref) => {
       <div
         ref={ref}
         style={{
-          opacity: showBar ? 1 : 0,
+          opacity: showInitialRecap || showBar ? 1 : 0,
           transition: "opacity 0.3s ease-in-out",
           display: "flex",
           flexDirection: "row",
@@ -84,14 +84,44 @@ const TopBar = forwardRef(({ showBar, onShowFeatureModal }, ref) => {
             display: none;
           }
         `}</style>
-  
-        <MenuItem icon={<LuList size={iconSize} color="#ababab"/>} label="Chapters" onShowFeatureModal={() => onShowFeatureModal(0)}/>
-        <MenuItem icon={<IoChatboxEllipsesOutline size={iconSize} color="#ababab" />} label="Ask Bro" onShowFeatureModal={() => onShowFeatureModal(1)}/>
-        <MenuItem icon={<PiSkipBack size={iconSize} color="#ababab" />} label="Previously On" onShowFeatureModal={() => onShowFeatureModal(2)}/>
-        <MenuItem icon={<LiaTheaterMasksSolid size={iconSize} color="#ababab" />} label="Scene It" onShowFeatureModal={() => onShowFeatureModal(3)}/>
-        <MenuItem icon={<LuSearch size={iconSize} color="#ababab" />} label="Search" onShowFeatureModal={() => onShowFeatureModal(4)} />
+    
+        {showInitialRecap ? (
+          <MenuItem
+            icon={<PiSkipBack size={iconSize} color="#ababab" />}
+            label="Previously On"
+            onShowFeatureModal={() => onShowFeatureModal(2)}
+          />
+        ) : (
+          <>
+            <MenuItem
+              icon={<LuList size={iconSize} color="#ababab" />}
+              label="Chapters"
+              onShowFeatureModal={() => onShowFeatureModal(0)}
+            />
+            <MenuItem
+              icon={<IoChatboxEllipsesOutline size={iconSize} color="#ababab" />}
+              label="Ask Bro"
+              onShowFeatureModal={() => onShowFeatureModal(1)}
+            />
+            <MenuItem
+              icon={<PiSkipBack size={iconSize} color="#ababab" />}
+              label="Previously On"
+              onShowFeatureModal={() => onShowFeatureModal(2)}
+            />
+            <MenuItem
+              icon={<LiaTheaterMasksSolid size={iconSize} color="#ababab" />}
+              label="Scene It"
+              onShowFeatureModal={() => onShowFeatureModal(3)}
+            />
+            <MenuItem
+              icon={<LuSearch size={iconSize} color="#ababab" />}
+              label="Search"
+              onShowFeatureModal={() => onShowFeatureModal(4)}
+            />
+          </>
+        )}
       </div>
-    );
-  });
+    )});
+    
 
 export default TopBar;

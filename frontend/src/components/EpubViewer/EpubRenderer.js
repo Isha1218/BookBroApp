@@ -6,7 +6,7 @@ import SelectionMenu from "./Tabs/SelectionMenu";
 import ViewFeatureModal from "./Modals/ViewFeatureModal";
 import { addHighlight, getHighlights } from "../../api/database/HighlightsApi";
 import { useSearchParams } from "react-router-dom";
-import { AWS_S3_URI_BASE } from "../../consts/consts";
+import { AWS_S3_URI_BASE } from "../../consts/consts_private";
 
 const EpubRenderer = () => {
   const [searchParams] = useSearchParams();
@@ -47,6 +47,7 @@ const EpubRenderer = () => {
   const [currentCfi, setCurrentCfi] = useState("");
   const [isLoadingBook, setIsLoadingBook] = useState(true);
   const [pagesLeftInChapter, setPagesLeftInChapter] = useState(0);
+  const [showInitialRecap, setShowInitialRecap] = useState(true)
 
   const calculatePagesLeftInChapter = useCallback(() => {
     if (!renditionRef.current || !bookRef.current) return 0;
@@ -203,6 +204,15 @@ const EpubRenderer = () => {
     const timer = setTimeout(() => setShowBar(false), 5000);
     return () => clearTimeout(timer);
   }, [showBar]);
+
+  useEffect(() => {
+    if (!showInitialRecap) return;
+    setShowBar(false)
+    const timer = setTimeout(() => {
+      setShowInitialRecap(false)
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [showInitialRecap])
 
   useEffect(() => {
     if (isTextSelected) setTimeout(() => setShowSelectionMenu(true), 50);
@@ -510,7 +520,7 @@ const EpubRenderer = () => {
         {isTextSelected ? (
           <SelectionMenu ref={menuRef} showBar={showSelectionMenu} onShowFeatureModal={handleShowFeatureModal} onHighlight={handleHighlight}/>
         ) : (
-          <TopBar ref={topBarRef} showBar={showBar} onShowFeatureModal={handleShowFeatureModal} />
+          <TopBar ref={topBarRef} showBar={showBar} onShowFeatureModal={handleShowFeatureModal} showInitialRecap={showInitialRecap}/>
         )}
 
         <div

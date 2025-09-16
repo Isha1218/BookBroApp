@@ -43,6 +43,7 @@ class BookManager:
         )
 
         result = []
+        print('num books', len(books))
         for b in books:
             cover_base64 = base64.b64encode(b.cover_image).decode() if b.cover_image else None
             result.append({

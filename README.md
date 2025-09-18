@@ -121,7 +121,7 @@ cp consts/s3_keys.example.py consts/s3_keys.py
 # Edit each file with your credentials (see Configuration section below)
 
 # Start FastAPI server
-uvicorn main:app --reload
+python -m uvicorn main:app --host 0.0.0.0 --port 5000 --reload
 ```
 
 ### 4. Mobile Development (Optional)

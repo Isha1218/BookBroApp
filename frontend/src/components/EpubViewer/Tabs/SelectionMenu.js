@@ -1,7 +1,16 @@
 import React, { forwardRef, useState, useEffect } from "react";
 import { PencilLine, Book } from "lucide-react";
 import { LuTextSearch } from "react-icons/lu";
-import { BsHighlighter } from "react-icons/bs";
+import { BsHighlighter, BsQuestionLg } from "react-icons/bs";
+import { TbQuestionMark } from "react-icons/tb";
+import { BsWikipedia } from "react-icons/bs";
+import { PiQuestion } from "react-icons/pi";
+import { AiOutlineQuestionCircle } from "react-icons/ai";
+import { LuScanFace } from "react-icons/lu";
+import { FaRegAddressBook } from "react-icons/fa";
+import { BiConfused } from "react-icons/bi";
+
+
 
 const iconSize = Math.max(16, Math.min(24, window.innerWidth * 0.02));
 
@@ -84,7 +93,7 @@ const SelectionMenu = forwardRef(({ showBar, onShowFeatureModal, onHighlight }, 
         `}</style>
   
         <MenuItem icon={<BsHighlighter size={iconSize} color="#ababab"/>} label="Highlight" onShowFeatureModal={() => onHighlight()} />
-        <MenuItem icon={<LuTextSearch size={iconSize} color="#ababab"/>} label="What's That" onShowFeatureModal={() => onShowFeatureModal(5)} />
+        <MenuItem icon={<BiConfused size={iconSize} color="#ababab"/>} label="Huh?" onShowFeatureModal={() => onShowFeatureModal(5)} />
       </div>
     );
   });

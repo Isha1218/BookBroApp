@@ -108,11 +108,11 @@ const TopBar = forwardRef(({ showBar, onShowFeatureModal, showInitialRecap }, re
               label="Previously On"
               onShowFeatureModal={() => onShowFeatureModal(2)}
             />
-            <MenuItem
+            {/* <MenuItem
               icon={<LiaTheaterMasksSolid size={iconSize} color="#ababab" />}
               label="Scene It"
               onShowFeatureModal={() => onShowFeatureModal(3)}
-            />
+            /> */}
             <MenuItem
               icon={<LuSearch size={iconSize} color="#ababab" />}
               label="Search"

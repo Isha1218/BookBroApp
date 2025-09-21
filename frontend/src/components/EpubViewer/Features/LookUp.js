@@ -62,14 +62,14 @@ const LookUp = ({ selectedText, book, rendition }) => {
                     margin: 0,
                     fontFamily: 'Libre Caslon Text'
                 }}>
-                {selectedText.toLowerCase()}
+                {selectedText.charAt(0).toUpperCase() + selectedText.slice(1)}
                 </p>
                 <p style={{
                     margin: 0,
                     fontSize: '20px',
                     fontFamily: 'Libre Caslon Text'
                 }}>
-                    {lookUpType.toLowerCase()}
+                    {lookUpType}
                 </p>
             </div>
             <p
@@ -79,7 +79,7 @@ const LookUp = ({ selectedText, book, rendition }) => {
               lineHeight: "1.6",
               fontFamily: "Libre Caslon Text"
             }}>
-                {lookUpText.toLowerCase()}
+                {lookUpText}
             </p>
         </div>
       );

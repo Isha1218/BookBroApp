@@ -9,6 +9,7 @@ import { AiOutlineQuestionCircle } from "react-icons/ai";
 import { LuScanFace } from "react-icons/lu";
 import { FaRegAddressBook } from "react-icons/fa";
 import { BiConfused } from "react-icons/bi";
+import { BsPersonVcard } from "react-icons/bs";
 
 
 
@@ -93,7 +94,7 @@ const SelectionMenu = forwardRef(({ showBar, onShowFeatureModal, onHighlight }, 
         `}</style>
   
         <MenuItem icon={<BsHighlighter size={iconSize} color="#ababab"/>} label="Highlight" onShowFeatureModal={() => onHighlight()} />
-        <MenuItem icon={<BiConfused size={iconSize} color="#ababab"/>} label="Huh?" onShowFeatureModal={() => onShowFeatureModal(5)} />
+        <MenuItem icon={<TbQuestionMark size={iconSize} color="#ababab"/>} label="Who's That" onShowFeatureModal={() => onShowFeatureModal(5)} />
       </div>
     );
   });

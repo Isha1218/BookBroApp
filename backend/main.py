@@ -9,6 +9,7 @@ from database.db_models import Highlight
 
 app = FastAPI()
 origins = [
+    "http://10.21.68.6:3000"
     "http://192.168.0.19:3000",  # your dev server
     "capacitor://localhost",      # Capacitor apps
     "*",                          # allow all for testing (not recommended in prod)

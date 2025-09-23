@@ -4,7 +4,7 @@ import { LuSettings2 } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { updateBookCurrCfi, updateBookStatus } from "../../../api/database/BooksApi";
 
-const BottomBar = ({ position, showBar, currentCfi, bookId }) => {
+const BottomBar = ({ position, showBar, currentCfi, bookId, onShowFeatureModal }) => {
     const navigate = useNavigate();
 
     const handleBackNavigation = async () => {
@@ -19,6 +19,10 @@ const BottomBar = ({ position, showBar, currentCfi, bookId }) => {
         await updateBookStatus(bookId, "in progress")
       }
       navigate("/");
+    }
+
+    const handleSettingsClick = () => {
+      onShowFeatureModal(6);
     }
 
     return (
@@ -46,7 +50,18 @@ const BottomBar = ({ position, showBar, currentCfi, bookId }) => {
             color: '#ababab',
             fontSize: 'clamp(0.8rem, 2.5vw, 1rem)',
           }}>{Math.round(position) + "%"}</p>
-          <LuSettings2 color='transparent' size={Math.max(16, Math.min(24, window.innerWidth * 0.02))}/>
+          <button 
+            onClick={handleSettingsClick}
+            style={{
+              background: 'none',
+              border: 'none',
+              margin: 0,
+              padding: 0,
+              cursor: 'pointer'
+            }}
+          >
+            <LuSettings2 color='#ababab' size={Math.max(16, Math.min(24, window.innerWidth * 0.02))}/>
+          </button>
         </div>
     )
 }

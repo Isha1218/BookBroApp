@@ -47,7 +47,15 @@ const EpubRenderer = () => {
   const [currentCfi, setCurrentCfi] = useState("");
   const [isLoadingBook, setIsLoadingBook] = useState(true);
   const [pagesLeftInChapter, setPagesLeftInChapter] = useState(0);
-  const [showInitialRecap, setShowInitialRecap] = useState(true)
+  const [showInitialRecap, setShowInitialRecap] = useState(true);
+
+  const [settings, setSettings] = useState({
+    fontSize: 20,
+    lineSpacing: 1.5,
+    textAlignment: 'justify',
+    backgroundColor: '#ffffff'
+  });
+  const [isApplyingSettings, setIsApplyingSettings] = useState(false);
 
   const calculatePagesLeftInChapter = useCallback(() => {
     if (!renditionRef.current || !bookRef.current) return 0;
@@ -74,14 +82,50 @@ const EpubRenderer = () => {
     const width = window.innerWidth;
     const minWidth = 320;
     const maxWidth = 1024;
-    const minFont = 20;
-    const maxFont = 32;
+    const minFont = settings.fontSize - 4; // Base responsive adjustment on user setting
+    const maxFont = settings.fontSize + 8;
 
     if (width <= minWidth) return minFont;
     if (width >= maxWidth) return maxFont;
 
     return minFont + ((width - minWidth) / (maxWidth - minWidth)) * (maxFont - minFont);
   };
+
+  const getTextColor = (backgroundColor) => {
+    if (backgroundColor === '#1a1a1a' || backgroundColor === '#2d2d2d') {
+      return '#ffffff';
+    }
+    return '#333333';
+  };
+
+  const applySettings = useCallback(() => {
+    if (!renditionRef.current) return;
+  
+    const fontSize = getResponsiveFontSize();
+    const textColor = getTextColor(settings.backgroundColor);
+  
+    // Apply overrides without redefining the theme
+    renditionRef.current.themes.override("font-size", `${fontSize}px`, "body");
+    renditionRef.current.themes.override("line-height", settings.lineSpacing, "body");
+    renditionRef.current.themes.override("text-align", settings.textAlignment, "body");
+    renditionRef.current.themes.override("background-color", settings.backgroundColor, "body");
+    renditionRef.current.themes.override("color", textColor, "body");
+    
+    renditionRef.current.themes.override("text-align", settings.textAlignment, "p");
+    renditionRef.current.themes.override("line-height", settings.lineSpacing, "p");
+  }, [settings]);
+  
+
+  const handleSettingsChange = useCallback((newSettings) => {
+    setSettings(newSettings);
+    console.log('these are the new settings', newSettings)
+  }, [bookId]);
+
+  useEffect(() => {
+    if (renditionRef.current && !isLoadingBook) {
+      applySettings();
+    }
+  }, [settings, applySettings, isLoadingBook]);
 
   const handleNavigate = useCallback(async (target) => {
     if (!renditionRef.current || !bookRef.current) {
@@ -110,6 +154,7 @@ const EpubRenderer = () => {
     setSelectedCfiRange("");
     setShowSelectionMenu(false);
     setShowBar(false);
+    applySettings();
   }, []);
 
   const handleTouchStart = useCallback((e) => {
@@ -233,6 +278,39 @@ const EpubRenderer = () => {
       flow: "paginated",
       spread: "none",
     });
+
+    renditionRef.current.themes.register("custom", {
+      body: {
+        "font-size": `${getResponsiveFontSize()}px !important`,
+        "line-height": `${settings.lineSpacing} !important`,
+        "text-align": `${settings.textAlignment} !important`,
+        "background-color": `${settings.backgroundColor} !important`,
+        "color": `${getTextColor(settings.backgroundColor)} !important`,
+        "margin": "0 !important",
+        "padding": "20px !important",
+        "user-select": "text !important",
+        "-webkit-user-select": "text !important",
+        "-webkit-touch-callout": "default !important",
+      },
+      p: {
+        "text-align": `${settings.textAlignment} !important`,
+        "line-height": `${settings.lineSpacing} !important`,
+        "margin-bottom": "1em !important",
+      },
+      div: {
+        "text-align": `${settings.textAlignment} !important`,
+        "line-height": `${settings.lineSpacing} !important`,
+      },
+      "::selection": { background: "rgba(255, 255, 0, 0.3)" },
+      "::-moz-selection": { background: "rgba(255, 255, 0, 0.3)" },
+      html: {
+        "background-color": `${settings.backgroundColor} !important`,
+      },
+    });
+    
+    // Apply the theme initially
+    renditionRef.current.themes.select("custom");
+    
 
     console.log('this is currCfi', startCfi)
 
@@ -392,38 +470,10 @@ const EpubRenderer = () => {
     renditionRef.current.on("touchstart", handleTouchStart);
     renditionRef.current.on("touchend", handleTouchEnd);
 
-    const applyFontSize = () => {
-      if (!renditionRef.current) return;
-      
-      isResizing.current = true;
-      
-      try {
-        const fontSize = getResponsiveFontSize();
-        renditionRef.current.themes.default({
-          body: {
-            "user-select": "text !important",
-            "-webkit-user-select": "text !important",
-            "-webkit-touch-callout": "default !important",
-            "font-size": `${fontSize}px !important`,
-          },
-          "::selection": { background: "rgba(255, 255, 0, 0.3)" },
-          "::-moz-selection": { background: "rgba(255, 255, 0, 0.3)" },
-        });
-      } catch (error) {
-        console.error('Error applying font size:', error);
-      }
-      
-      setTimeout(() => {
-        isResizing.current = false;
-      }, 300);
-    };
-
-    applyFontSize();
-
     let resizeTimeout;
     const debouncedResize = () => {
       clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(applyFontSize, 100);
+      resizeTimeout = setTimeout(applySettings, 100);
     };
 
     window.addEventListener("resize", debouncedResize);
@@ -433,7 +483,7 @@ const EpubRenderer = () => {
       setSelectedCfiRange("");
       setShowSelectionMenu(false);
       
-      setTimeout(applyFontSize, 500);
+      setTimeout(applySettings, 500);
     });
 
     return () => {
@@ -441,9 +491,9 @@ const EpubRenderer = () => {
       renditionRef.current?.destroy();
       bookRef.current?.destroy();
       window.removeEventListener("resize", debouncedResize);
-      window.removeEventListener("orientationchange", applyFontSize);
+      window.removeEventListener("orientationchange", applySettings);
     };
-  }, [handleTouchStart, handleTouchEnd]);
+  }, [handleTouchStart, handleTouchEnd, applySettings]);
 
   const spinnerStyle = {
     width: '50px',
@@ -475,6 +525,7 @@ const EpubRenderer = () => {
           justifyContent: "center",
           padding: "40px",
           boxSizing: "border-box",
+          backgroundColor: settings.backgroundColor,
         }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
@@ -490,14 +541,14 @@ const EpubRenderer = () => {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: '#fff',
+            backgroundColor: settings.backgroundColor,
             zIndex: 1000,
             gap: '24px'
           }}>
             <div style={spinnerStyle}></div>
             <div style={{
               textAlign: 'center',
-              color: '#666'
+              color: getTextColor(settings.backgroundColor)
             }}>
               <p style={{
                 fontSize: '18px',
@@ -543,6 +594,9 @@ const EpubRenderer = () => {
             selectedText={selectedText}
             title={title}
             pagesLeftInChapter={pagesLeftInChapter}
+            settings={settings}
+            onSettingsChange={handleSettingsChange}
+            isApplyingSettings={isApplyingSettings}
           />
         )}
         <BottomBar
@@ -550,6 +604,7 @@ const EpubRenderer = () => {
           showBar={showBar}
           currentCfi={currentCfi}
           bookId={bookId}
+          onShowFeatureModal={handleShowFeatureModal}
         />
       </div>
     </>

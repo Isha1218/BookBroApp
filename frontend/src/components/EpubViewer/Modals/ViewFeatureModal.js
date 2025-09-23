@@ -5,16 +5,31 @@ import Roleplay from "../Features/Roleplay";
 import Search from "../Features/Search";
 import Settings from "../Features/Settings";
 import TableOfContents from "../Features/TableOfContents";
-import React from "react";
+import React, { useState } from "react";
 
-const ViewFeatureModal = ({ onCloseFeatureModal, toc, onNavigate, currIndex, book, rendition, featureModalIndex, selectedText = '', title, pagesLeftInChapter }) => {
+const ViewFeatureModal = ({ 
+    onCloseFeatureModal, 
+    toc, 
+    onNavigate, 
+    currIndex, 
+    book, 
+    rendition, 
+    featureModalIndex, 
+    selectedText = '', 
+    title, 
+    pagesLeftInChapter,
+    settings,
+    onSettingsChange,
+    isApplyingSettings
+}) => {
     const features = [
         <TableOfContents toc={toc} onNavigate={onNavigate} currIndex={currIndex} pagesLeftInChapter={pagesLeftInChapter}/>,
         <Chat book={book} rendition={rendition}/>,
         <Recap book={book} rendition={rendition} title={title}/>,
         <Roleplay book={book} rendition={rendition}/>,
         <Search book={book} toc={toc} onNavigate={onNavigate} />,
-        <LookUp book={book} rendition={rendition} selectedText={selectedText}/>
+        <LookUp book={book} rendition={rendition} selectedText={selectedText}/>,
+        <Settings onSettingsChange={onSettingsChange} initialSettings={settings} isApplyingSettings={isApplyingSettings}/>
     ];
 
     return (
@@ -63,12 +78,6 @@ const ViewFeatureModal = ({ onCloseFeatureModal, toc, onNavigate, currIndex, boo
                 >
                     ✕
                 </button>
-                {/* <TableOfContents toc={toc} onNavigate={onNavigate} currIndex={currIndex}/> */}
-                {/* <Recap/> */}
-                {/* <Search book={book} toc={toc} onNavigate={onNavigate} /> */}
-                {/* <Chat/> */}
-                {/* <Roleplay/> */}
-                {/* <LookUp/> */}
                 {features[featureModalIndex]}
             </div>
         </div>

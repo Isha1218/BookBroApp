@@ -102,7 +102,7 @@ const MessageInput = ({ onSendMessage, isLoading }) => {
 
 const Chat = ({ book, rendition }) => {
     const [messages, setMessages] = useState([
-        { id: 1, text: "Hey! I'm Bro, your reading companion. Ask me anything about the book you're reading!", isUser: false }
+        { id: 1, text: "Hey! I'm Book Bro, your reading companion. Ask me anything about the book you're reading!", isUser: false }
     ]);
     const [isLoading, setIsLoading] = useState(false);
     const chatContainerRef = useRef(null);

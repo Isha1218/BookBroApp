@@ -25,7 +25,7 @@ const MenuItem = ({ icon, label, onShowFeatureModal }) => (
         flexShrink: 0,
         whiteSpace: "nowrap",
         gap: "clamp(0.375rem, 2vw, 0.625rem)",
-        fontSize: "16px",
+        fontSize: 'clamp(14px, 2.5vw, 16px)',
         minWidth: 0,
       }}
     >

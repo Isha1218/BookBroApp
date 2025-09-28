@@ -48,7 +48,7 @@ const BottomBar = ({ position, showBar, currentCfi, bookId, onShowFeatureModal }
           }}><FiArrowLeft color='#ababab' size={Math.max(18, Math.min(24, window.innerWidth * 0.02))}/></button>
           <p style={{
             color: '#ababab',
-            fontSize: '16px',
+            fontSize: 'clamp(14px, 2.5vw, 16px)',
           }}>{Math.round(position) + "%"}</p>
           <button 
             onClick={handleSettingsClick}

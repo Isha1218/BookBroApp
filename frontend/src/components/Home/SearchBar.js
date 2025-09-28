@@ -32,7 +32,7 @@ const SearchBar = ({ onSearch }) => {
             backgroundColor: '#ececec',
             borderRadius: '10px',
             padding: '8px 16px 8px 16px',
-            margin: '0 40px',
+            margin: `0 clamp(0px, 5vw, 40px)`,
             display: 'flex',
             flexDirection: 'row',
             gap: '10px',

@@ -82,7 +82,7 @@ const HomePage = () => {
         <>
             <style>{keyframes}</style>
             <div style={{
-                padding: '32px'
+                padding: `40px clamp(16px, 4vw, 32px)`,
             }}>
                 <TopBar userId={1} onUploadSuccess={fetchBooks}/>
                 <SearchBar onSearch={handleSearch}/>

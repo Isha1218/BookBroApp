@@ -68,7 +68,7 @@ const TopBar = ({ userId, onUploadSuccess }) => {
 
     return (
         <div style={{
-            margin: '20px 40px'
+            margin: '20px clamp(0px, 5vw, 40px)'
         }}>
             <style>{keyframes}</style>
             <div style={{

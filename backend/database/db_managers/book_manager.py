@@ -35,6 +35,7 @@ class BookManager:
         return curr_cfi
     
     def get_books(self, user_id):
+        print("in get books")
         books = (
             self.db.query(Book)
             .filter_by(user_id=user_id)

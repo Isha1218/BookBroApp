@@ -5,8 +5,8 @@ const config: CapacitorConfig = {
   appName: 'BookBro',
   webDir: 'build',
   server: {
-    url: "http://10.21.68.6:3000",
-    // url: "http://192.168.0.19:3000",
+    // url: "http://10.21.68.6:3000",
+    url: "http://192.168.0.19:3000",
     cleartext: true
   }
 };

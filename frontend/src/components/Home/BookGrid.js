@@ -8,11 +8,11 @@ const BookGrid = ({ books }) => {
   
   const gridStyle = {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 200px))',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(clamp(100px, 15vw, 200px), 1fr))',
     gap: '20px',
     maxWidth: '1200px',
     margin: '0 auto',
-    padding: '0 40px',
+    padding: `0 clamp(0px, 5vw, 40px)`,
     justifyContent: 'space-evenly',
   };
 

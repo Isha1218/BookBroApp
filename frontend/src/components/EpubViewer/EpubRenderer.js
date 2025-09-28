@@ -523,7 +523,7 @@ const EpubRenderer = () => {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "40px",
+          padding: `${/iPhone/i.test(navigator.userAgent) ? '60px' : '40px'} 20px 30px 20px`,
           boxSizing: "border-box",
           backgroundColor: settings.backgroundColor,
         }}

@@ -6,7 +6,7 @@ import { GiDualityMask } from "react-icons/gi";
 import { LiaTheaterMasksSolid } from "react-icons/lia";
 
 
-const iconSize = Math.max(16, Math.min(24, window.innerWidth * 0.02));
+const iconSize = Math.max(18, Math.min(24, window.innerWidth * 0.02));
 
 const MenuItem = ({ icon, label, onShowFeatureModal }) => (
   <button onClick={onShowFeatureModal} style={{
@@ -20,7 +20,7 @@ const MenuItem = ({ icon, label, onShowFeatureModal }) => (
         flexShrink: 0,
         whiteSpace: "nowrap",
         gap: "clamp(0.375rem, 2vw, 0.625rem)",
-        fontSize: "clamp(0.8rem, 2.5vw, 1rem)",
+        fontSize: "16px",
         minWidth: 0,
       }}
     >

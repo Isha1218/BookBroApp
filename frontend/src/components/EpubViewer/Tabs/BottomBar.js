@@ -45,10 +45,10 @@ const BottomBar = ({ position, showBar, currentCfi, bookId, onShowFeatureModal }
             border: 'none',
             margin: 0,
             padding: 0,
-          }}><FiArrowLeft color='#ababab' size={Math.max(16, Math.min(24, window.innerWidth * 0.02))}/></button>
+          }}><FiArrowLeft color='#ababab' size={Math.max(18, Math.min(24, window.innerWidth * 0.02))}/></button>
           <p style={{
             color: '#ababab',
-            fontSize: 'clamp(0.8rem, 2.5vw, 1rem)',
+            fontSize: '16px',
           }}>{Math.round(position) + "%"}</p>
           <button 
             onClick={handleSettingsClick}
@@ -60,7 +60,7 @@ const BottomBar = ({ position, showBar, currentCfi, bookId, onShowFeatureModal }
               cursor: 'pointer'
             }}
           >
-            <LuSettings2 color='#ababab' size={Math.max(16, Math.min(24, window.innerWidth * 0.02))}/>
+            <LuSettings2 color='#ababab' size={Math.max(18, Math.min(24, window.innerWidth * 0.02))}/>
           </button>
         </div>
     )
